@@ -4,15 +4,15 @@ public class AnalyseDonnees {
 	
 	public static Vect3 calculCoordonnées (Amas amas) {
 		Vect3 VectPos = new Vect3(0, 0, 0);
-		
-		int glon = amas.glon;
-		int glat = amas.glat;
-		int dist = amas.dist;
-		
-		VectPos.setX(dist*(Math.cos((double) glat))*(Math.sin((double) glon)));
-		VectPos.setY(dist*(Math.cos((double) glat))*(Math.cos((double) glon)));
-		VectPos.setZ(dist*(Math.sin((double) glat)));
-		
+
+		double glon = amas.getGlon();
+		double glat = amas.getGlat();
+		double dist = amas.getDist();
+
+		VectPos.setX(dist * (Math.cos(glat)) * (Math.sin(glon)));
+		VectPos.setY(dist * (Math.cos(glat)) * (Math.cos(glon)));
+		VectPos.setZ(dist * (Math.sin(glat)));
+
 		return VectPos;
 	}
 	public static double calculDist(double x1, double y1, double z1, double x2, double y2, double z2) {
