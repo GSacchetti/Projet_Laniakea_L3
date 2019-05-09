@@ -57,9 +57,9 @@ public class AnalyseDonnees {
 			Vect3 acc = t[i].getAcc();
 			int x,y,z;
 			
-			x = t[i-1].getVit().getX() + (acc.getX() + t[i-1].getAcc().getX())*0.5*dt;
-			y = t[i-1].getVit().geY() + (acc.getY() + t[i-1].getAcc().getY())*0.5*dt;
-			y = t[i-1].getVit().getZ() + (acc.getZ() + t[i-1].getAcc().getZ())*0.5*dt;
+			x = t[i].getVit().getX() + (acc.getX() + calcAcc(i, t).getX())*0.5*dt;
+			y = t[i].getVit().geY() + (acc.getY() + calcAcc(i, t).getY())*0.5*dt;
+			y = t[i].getVit().getZ() + (acc.getZ() + calcAcc(i, t).getZ())*0.5*dt;
 			
 			t[i].getVit().setX(x);
 			t[i].getVit().setY(y);
