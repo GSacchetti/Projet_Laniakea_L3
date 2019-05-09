@@ -1,6 +1,7 @@
 package Donnees;
 
 public class AnalyseDonnees {
+	final static double G = 6.67408 * Math.pow(10.0, -11.0);
 	
 	public static Vect3 calculCoordonnées (Amas amas) {
 		Vect3 VectPos = new Vect3(0, 0, 0);
