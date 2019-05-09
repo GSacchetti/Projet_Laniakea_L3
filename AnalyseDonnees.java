@@ -2,7 +2,7 @@ package Donnees;
 
 public class AnalyseDonnees {
 	
-	public static Vect3 Calcul_Coordonnées (Amas amas) {
+	public static Vect3 calculCoordonnées (Amas amas) {
 		Vect3 VectPos = new Vect3(0, 0, 0);
 		
 		int glon = amas.glon;
