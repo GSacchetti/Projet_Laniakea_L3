@@ -25,7 +25,7 @@ public class AnalyseDonnees {
 		return res;
 	}
 
-	public static Vect3 calculAcc(int n,Galaxie[] t) {
+	public static Vect3 calculAcc(int n,Amas[] t) {
 		Vect3 res = new Vect3(0,0,0);
 		Vect3 tmp = new Vect3(0,0,0);
 		double x,y,z;
