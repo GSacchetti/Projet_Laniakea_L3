@@ -6,9 +6,9 @@ public class AnalyseDonnees {
 	public static Vect3 calculCoordonnées (Amas amas) {
 		Vect3 VectPos = new Vect3(0, 0, 0);
 
-		double glon = (double) amas.getGlon();
-		double glat = (double) amas.getGlat();
-		double dist = (double) amas.getDist();
+		double glon = amas.getGlon();
+		double glat = amas.getGlat();
+		double dist = amas.getDist();
 
 		VectPos.setX(dist * (Math.cos(glat)) * (Math.sin(glon)));
 		VectPos.setY(dist * (Math.cos(glat)) * (Math.cos(glon)));
