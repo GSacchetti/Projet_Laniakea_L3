@@ -58,8 +58,8 @@ public class AnalyseDonnees {
 		int x,y,z;
 			
 		x = t[i].getVit().getX() + (acc.getX() + calcAcc(i, t).getX())*0.5*dt;
-		y = t[i].getVit().geY() + (acc.getY() + calcAcc(i, t).getY())*0.5*dt;
-		y = t[i].getVit().getZ() + (acc.getZ() + calcAcc(i, t).getZ())*0.5*dt;
+		y = t[i].getVit().getY() + (acc.getY() + calcAcc(i, t).getY())*0.5*dt;
+		z = t[i].getVit().getZ() + (acc.getZ() + calcAcc(i, t).getZ())*0.5*dt;
 			
 		t[i].getVit().setX(x);
 		t[i].getVit().setY(y);
