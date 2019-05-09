@@ -53,19 +53,34 @@ public class AnalyseDonnees {
 		return res;
 	}
 	public static void calculVit(int i, Amas[] t, int dt) {
-		if (i >= 1) {
-			Vect3 acc = t[i].getAcc();
-			int x,y,z;
+		
+		Vect3 acc = t[i].getAcc();
+		int x,y,z;
 			
-			x = t[i].getVit().getX() + (acc.getX() + calcAcc(i, t).getX())*0.5*dt;
-			y = t[i].getVit().geY() + (acc.getY() + calcAcc(i, t).getY())*0.5*dt;
-			y = t[i].getVit().getZ() + (acc.getZ() + calcAcc(i, t).getZ())*0.5*dt;
+		x = t[i].getVit().getX() + (acc.getX() + calcAcc(i, t).getX())*0.5*dt;
+		y = t[i].getVit().geY() + (acc.getY() + calcAcc(i, t).getY())*0.5*dt;
+		y = t[i].getVit().getZ() + (acc.getZ() + calcAcc(i, t).getZ())*0.5*dt;
 			
-			t[i].getVit().setX(x);
-			t[i].getVit().setY(y);
-			t[i].getVit().setZ(z);
-		}else return;
+		t[i].getVit().setX(x);
+		t[i].getVit().setY(y);
+		t[i].getVit().setZ(z);
 	}
-	
+		
+	public static void calculPos(int i, Amas[] t, int dt) {
+		
+		Vect3 pos = t[i].getPos();
+		Vect3 vit = t[i].getVit();
+		Vect3 acc = t[i].getAcc();
+		int x,y,z;
+		
+		x = pos.getX() + vit.getX()*dt + acc.getX()*0.5*dt*dt;
+		y = pos.getY() + vit.getY()*dt + acc.getY()*0.5*dt*dt; 
+		z = pos.getZ() + vit.getZ()*dt + acc.getZ()*0.5*dt*dt; 
+		
+		t[i].getPos().setX(x);
+		t[i].getPos().setY(y);
+		t[i].getPos().setZ(z);
+				
+	}
 	
 }
