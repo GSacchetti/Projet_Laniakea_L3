@@ -52,4 +52,20 @@ public class AnalyseDonnees {
 		res.mul(G);// facteur constante G
 		return res;
 	}
+	public static void calculVit(int i, Amas[] t, int dt) {
+		if (i >= 1) {
+			Vect3 acc = t[i].getAcc();
+			int x,y,z;
+			
+			x = t[i-1].getVit().getX() + (acc.getX() + t[i-1].getAcc().getX())*0.5*dt;
+			y = t[i-1].getVit().geY() + (acc.getY() + t[i-1].getAcc().getY())*0.5*dt;
+			y = t[i-1].getVit().getZ() + (acc.getZ() + t[i-1].getAcc().getZ())*0.5*dt;
+			
+			t[i].getVit().setX(x);
+			t[i].getVit().setY(y);
+			t[i].getVit().setZ(z);
+		}else return;
+	}
+	
+	
 }
