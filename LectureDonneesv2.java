@@ -110,6 +110,8 @@ public class LectureDonnees {
 							break;
 						}
 					}
+					galaxy.setPos(AnalyseDonnees.calculCoordonnees(galaxy));
+					galaxy.setPos2(AnalyseDonnees.calculCoordonnees(galaxy));
 					tab[0][c] = galaxy;
 					tab[1][c] = galaxy;
 					c++;
