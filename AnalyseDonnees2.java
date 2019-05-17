@@ -4,15 +4,17 @@ import java.io.IOException;
 
 public class AnalyseDonnees {
 	final static double G = 6.67408 * Math.pow(10.0, -11.0);
-	final static double KM = Math.pow(10.0, 12.0);
+	final static double MPC = 3.086 * Math.pow(10.0, 22.0);
+	final static double TMsun = 1.9884 * Math.pow(10.0, 42.0);
 	final static int NB = 11508;
+
 	public static Vect3 calculCoordonnees(Amas amas) {
 		Vect3 VectPos = new Vect3(0, 0, 0);
 
 		double glon = amas.getGlon();
 		double glat = amas.getGlat();
 		double dist = amas.getDist();
-		
+
 		VectPos.setX(dist * (Math.cos(Math.toRadians(glat))) * (Math.sin(Math.toRadians(glon))));
 		VectPos.setY(dist * (Math.cos(Math.toRadians(glat))) * (Math.cos(Math.toRadians(glon))));
 		VectPos.setZ(dist * (Math.sin(Math.toRadians(glat))));
@@ -41,9 +43,9 @@ public class AnalyseDonnees {
 		for (int k = 0; k < NB; k++) {
 			if (k != j) {
 				if (k < j) {
-					masse = t[i][k].getMvir();
+					masse = t[i][k].getMvir() * TMsun;
 					dist = calculDist(x, y, z, t[i][k].getPos().getX(), t[i][k].getPos().getY(),
-							t[i][k].getPos().getZ());
+							t[i][k].getPos().getZ()) * MPC;
 					dist *= dist;// d²
 					force = masse / dist;// mB/d²
 					// vecteur
@@ -54,9 +56,9 @@ public class AnalyseDonnees {
 					tmp.mul(force);// vecteur*force
 					res.addV(tmp);// addition avec les autres vecteurs acc
 				} else {
-					masse = t[i][k].getMvir();
+					masse = t[i][k].getMvir() * TMsun;
 					dist = calculDist(x, y, z, t[i][k].getPos().getX(), t[i][k].getPos().getY(),
-							t[i][k].getPos().getZ());
+							t[i][k].getPos().getZ()) * MPC;
 					dist *= dist;// d²
 					force = masse / dist;// mB/d²
 					// vecteur
@@ -70,7 +72,7 @@ public class AnalyseDonnees {
 			}
 		}
 		res.mul(G);// facteur constante G
-		
+
 		return res;
 	}
 
@@ -124,7 +126,7 @@ public class AnalyseDonnees {
 			}
 		}
 		for (int j = 0; j < NB; j++) {
-			res[frames-1][j].setPos(Vect3.copie(res[frames-1][j].getPos2()));
+			res[frames - 1][j].setPos(Vect3.copie(res[frames - 1][j].getPos2()));
 		}
 		return res;
 	}
