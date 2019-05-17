@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class LectureDonnees {
-	final static double G = 6.67408 * Math.pow(10.0, -11.0);
 
 	public static void donnees(Amas[][] tab) throws IOException {
 		String ligne = "";
@@ -133,11 +132,11 @@ public class LectureDonnees {
 	}
 
 	public static void main(String[] args) throws IOException {
-		int f = 5;
-		Amas[][] tab = AnalyseDonnees.produitFinal(1, f);
+		int f = 200;
+		Amas[][] tab = AnalyseDonnees.produitFinal(10000, f);
 		for (int i = 0; i < f; i++) {
-			for (int j = 0; j < 3; j++) {
-				System.out.println(tab[i][j].getPos().getX()*100000);
+			for (int j = 0; j < 1; j++) {
+				System.out.println(tab[i][j].getPos().getX()+" "+tab[i][j].getPos().getY()+" "+tab[i][j].getPos().getZ());
 			}
 		}
 
