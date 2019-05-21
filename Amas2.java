@@ -4,7 +4,7 @@ public class Amas {
 	private int nest, vgsr;
 	private String abell, gName;
 	private double glon, glat, dist, mvir;
-	private Vect3 acc, vit, pos, pos2;
+	private Vect3 vit, pos, pos2;
 
 	public Amas() {
 		this.nest = 0;
@@ -15,7 +15,7 @@ public class Amas {
 		this.glon = 0;
 		this.glat = 0;
 		this.dist = 0;
-		this.acc = new Vect3(0, 0, 0);
+		
 		this.vit = new Vect3(0, 0, 0);
 		this.pos = new Vect3(0, 0, 0);
 		this.pos2 = new Vect3(0, 0, 0);
@@ -31,7 +31,7 @@ public class Amas {
 		res.glon = a.glon;
 		res.glat = a.glat;
 		res.dist = a.dist;
-		res.acc = Vect3.copie(a.acc);
+		
 		res.vit = Vect3.copie(a.vit);
 		res.pos = Vect3.copie(a.pos);
 		res.pos2 = Vect3.copie(a.pos2);
@@ -45,13 +45,7 @@ public class Amas {
 		this.pos2 = pos2;
 	}
 
-	public Vect3 getAcc() {
-		return acc;
-	}
-
-	public void setAcc(Vect3 acc) {
-		this.acc = acc;
-	}
+	
 
 	public Vect3 getVit() {
 		return vit;
