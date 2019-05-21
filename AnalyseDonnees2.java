@@ -47,24 +47,24 @@ public class AnalyseDonnees {
 		for (int k = 0; k < NB; k++) {
 			if (k != j) {
 				masse = t[i][k].getMvir();
-				dist = calculDist(x, y, z, t[i][k].getPos().getX(), t[i][k].getPos().getY(), t[i][k].getPos().getZ());
-				dist *= dist;// dÂ²
-				force = masse / dist;// mB/dÂ²
-				if (k < j) {
-
-					// vecteur change (amas precedents)
+				
+				if (k < j) {// vecteur change (amas precedents)
+					dist = calculDist(x, y, z, t[i][k].getPos().getX(), t[i][k].getPos().getY(), t[i][k].getPos().getZ());
+					dist *= dist;// dÂ²
+					force = masse / dist;// mB/dÂ²
+					
 					tmp.setX(t[i][k].getPos().getX() - x);
 					tmp.setY(t[i][k].getPos().getY() - y);
 					tmp.setZ(t[i][k].getPos().getZ() - z);
-					// ------------------
 
-				} else {
-
-					// vecteur pas encore change (amas suivants)
+				} else {// vecteur pas encore change (amas suivants)
+					dist = calculDist(x, y, z, t[i][k].getPos2().getX(), t[i][k].getPos2().getY(), t[i][k].getPos2().getZ());
+					dist *= dist;// dÂ²	
+					force = masse / dist;// mB/dÂ²
+					
 					tmp.setX(t[i][k].getPos2().getX() - x);
 					tmp.setY(t[i][k].getPos2().getY() - y);
 					tmp.setZ(t[i][k].getPos2().getZ() - z);
-					// ------------------
 
 				}
 				tmp.mul(force);// vecteur*force
