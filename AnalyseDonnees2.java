@@ -9,17 +9,21 @@ public class AnalyseDonnees {
 	final static int NB = 11508;
 
 	public static Vect3 calculCoordonnees(Amas amas) {
-		Vect3 VectPos = new Vect3(0, 0, 0);
+		Vect3 vectPos = new Vect3(0, 0, 0);
 
 		double glon = amas.getGlon();
 		double glat = amas.getGlat();
 		double dist = amas.getDist();
 
-		VectPos.setX(dist * (Math.cos(Math.toRadians(glat))) * (Math.sin(Math.toRadians(glon))));
-		VectPos.setY(dist * (Math.cos(Math.toRadians(glat))) * (Math.cos(Math.toRadians(glon))));
-		VectPos.setZ(dist * (Math.sin(Math.toRadians(glat))));
-
-		return VectPos;
+		vectPos.setX(dist * (Math.cos(Math.toRadians(glat))) * (Math.sin(Math.toRadians(glon))));
+		vectPos.setY(dist * (Math.cos(Math.toRadians(glat))) * (Math.cos(Math.toRadians(glon))));
+		vectPos.setZ(dist * (Math.sin(Math.toRadians(glat))));
+		
+		// vitesse propre initiale
+		//amas.setVit(new Vect3(vectPos.getX()*(amas.getVgsr()-76*(dist/PC)),vectPos.getY()*(amas.getVgsr()-76*(dist/PC)),vectPos.getZ()*(amas.getVgsr()-76*(dist/PC))));
+		//--------
+		
+		return vectPos;
 	}
 
 	public static double calculDist(double x1, double y1, double z1, double x2, double y2, double z2) {
