@@ -20,7 +20,9 @@ public class AnalyseDonnees {
 		vectPos.setZ(dist * (Math.sin(Math.toRadians(glat))));
 		
 		// vitesse propre initiale
-		//amas.setVit(new Vect3(vectPos.getX()*(amas.getVgsr()-76*(dist/PC)),vectPos.getY()*(amas.getVgsr()-76*(dist/PC)),vectPos.getZ()*(amas.getVgsr()-76*(dist/PC))));
+		/*amas.getVit().setX((vectPos.getX()/dist)*(amas.getVgsr()-75*(dist/PC))*1000);
+		amas.getVit().setY((vectPos.getY()/dist)*(amas.getVgsr()-75*(dist/PC))*1000);
+		amas.getVit().setZ((vectPos.getZ()/dist)*(amas.getVgsr()-75*(dist/PC))*1000);*/
 		//--------
 		
 		return vectPos;
@@ -40,7 +42,7 @@ public class AnalyseDonnees {
 		Vect3 res = new Vect3(0, 0, 0);
 		Vect3 tmp = new Vect3(0, 0, 0);
 		double x, y, z;
-		double masse, dist, force;
+		double masse, dist, force, dist2;
 		x = t[i][j].getPos().getX();
 		y = t[i][j].getPos().getY();
 		z = t[i][j].getPos().getZ();
@@ -50,21 +52,21 @@ public class AnalyseDonnees {
 				
 				if (k < j) {// vecteur change (amas precedents)
 					dist = calculDist(x, y, z, t[i][k].getPos().getX(), t[i][k].getPos().getY(), t[i][k].getPos().getZ());
-					dist *= dist;// dÂ²
-					force = masse / dist;// mB/dÂ²
+					dist2 = dist*dist;// dÂ²
+					force = masse / dist2;// mB/dÂ²
 					
-					tmp.setX(t[i][k].getPos().getX() - x);
-					tmp.setY(t[i][k].getPos().getY() - y);
-					tmp.setZ(t[i][k].getPos().getZ() - z);
+					tmp.setX((t[i][k].getPos().getX() - x)/dist);
+					tmp.setY((t[i][k].getPos().getY() - y)/dist);
+					tmp.setZ((t[i][k].getPos().getZ() - z)/dist);
+					
 
 				} else {// vecteur pas encore change (amas suivants)
 					dist = calculDist(x, y, z, t[i][k].getPos2().getX(), t[i][k].getPos2().getY(), t[i][k].getPos2().getZ());
-					dist *= dist;// dÂ²	
-					force = masse / dist;// mB/dÂ²
-					
-					tmp.setX(t[i][k].getPos2().getX() - x);
-					tmp.setY(t[i][k].getPos2().getY() - y);
-					tmp.setZ(t[i][k].getPos2().getZ() - z);
+					dist2 = dist*dist;// dÂ²
+					force = masse / dist2;// mB/dÂ²
+					tmp.setX((t[i][k].getPos2().getX() - x)/dist);
+					tmp.setY((t[i][k].getPos2().getY() - y)/dist);
+					tmp.setZ((t[i][k].getPos2().getZ() - z)/dist);
 
 				}
 				tmp.mul(force);// vecteur*force
