@@ -46,33 +46,29 @@ public class AnalyseDonnees {
 		z = t[i][j].getPos().getZ();
 		for (int k = 0; k < NB; k++) {
 			if (k != j) {
+				masse = t[i][k].getMvir();
+				dist = calculDist(x, y, z, t[i][k].getPos().getX(), t[i][k].getPos().getY(), t[i][k].getPos().getZ());
+				dist *= dist;// dÂ²
+				force = masse / dist;// mB/dÂ²
 				if (k < j) {
-					masse = t[i][k].getMvir() * TMsun;
-					dist = calculDist(x, y, z, t[i][k].getPos().getX(), t[i][k].getPos().getY(),
-							t[i][k].getPos().getZ()) * MPC;
-					dist *= dist;// d²
-					force = masse / dist;// mB/d²
-					// vecteur
+
+					// vecteur change (amas precedents)
 					tmp.setX(t[i][k].getPos().getX() - x);
 					tmp.setY(t[i][k].getPos().getY() - y);
 					tmp.setZ(t[i][k].getPos().getZ() - z);
 					// ------------------
-					tmp.mul(force);// vecteur*force
-					res.addV(tmp);// addition avec les autres vecteurs acc
+
 				} else {
-					masse = t[i][k].getMvir() * TMsun;
-					dist = calculDist(x, y, z, t[i][k].getPos().getX(), t[i][k].getPos().getY(),
-							t[i][k].getPos().getZ()) * MPC;
-					dist *= dist;// d²
-					force = masse / dist;// mB/d²
-					// vecteur
+
+					// vecteur pas encore change (amas suivants)
 					tmp.setX(t[i][k].getPos2().getX() - x);
 					tmp.setY(t[i][k].getPos2().getY() - y);
 					tmp.setZ(t[i][k].getPos2().getZ() - z);
 					// ------------------
-					tmp.mul(force);// vecteur*force
-					res.addV(tmp);// addition avec les autres vecteurs acc
+
 				}
+				tmp.mul(force);// vecteur*force
+				res.addV(tmp);// addition avec les autres vecteurs acc
 			}
 		}
 		res.mul(G);// facteur constante G
@@ -82,22 +78,16 @@ public class AnalyseDonnees {
 
 	public static void calculVit(int i, int j, Amas[][] t, int dt) {
 
-		Vect3 acc = t[i][j].getAcc();
 		double x, y, z;
-		Vect3 acc2 = calculAcc(i, j, t);
-		x = t[i][j].getVit().getX() + (acc.getX() + acc2.getX()) * 0.5 * dt;
-		y = t[i][j].getVit().getY() + (acc.getY() + acc2.getY()) * 0.5 * dt;
-		z = t[i][j].getVit().getZ() + (acc.getZ() + acc2.getZ()) * 0.5 * dt;
+		Vect3 acc = calculAcc(i, j, t);
+		x = t[i][j].getVit().getX() + acc.getX() * dt;
+		y = t[i][j].getVit().getY() + acc.getY() * dt;
+		z = t[i][j].getVit().getZ() + acc.getZ() * dt;
 
 		// maj vitesse
 		t[i][j].getVit().setX(x);
 		t[i][j].getVit().setY(y);
 		t[i][j].getVit().setZ(z);
-
-		// maj acceleration
-		t[i][j].getAcc().setX(acc2.getX());
-		t[i][j].getAcc().setY(acc2.getX());
-		t[i][j].getAcc().setZ(acc2.getX());
 
 	}
 
@@ -106,12 +96,11 @@ public class AnalyseDonnees {
 
 		Vect3 pos = t[i][j].getPos();
 		Vect3 vit = t[i][j].getVit();
-		Vect3 acc = t[i][j].getAcc();
 
-		x = pos.getX() + vit.getX() * dt + acc.getX() * 0.5 * dt * dt;
-		y = pos.getY() + vit.getY() * dt + acc.getY() * 0.5 * dt * dt;
-		z = pos.getZ() + vit.getZ() * dt + acc.getZ() * 0.5 * dt * dt;
-
+		x = pos.getX() + vit.getX() * dt;
+		y = pos.getY() + vit.getY() * dt;
+		z = pos.getZ() + vit.getZ() * dt;
+		
 		t[i][j].getPos2().setX(x);
 		t[i][j].getPos2().setY(y);
 		t[i][j].getPos2().setZ(z);
