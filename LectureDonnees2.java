@@ -10,7 +10,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class LectureDonnees {
-
+	
+	final static double TMsun = 1.9884 * Math.pow(10.0, 42.0);
+	final static double MPC = 3.0856775814672 * Math.pow(10.0, 22.0);
+	
 	public static void donnees(Amas[][] tab) throws IOException {
 		String ligne = "";
 		String fichier = "";
@@ -19,7 +22,7 @@ public class LectureDonnees {
 		fichier = "table2.dat";
 		BufferedReader ficTexte;
 		try {
-			ficTexte = new BufferedReader(new FileReader(new File("table3.dat")));
+			ficTexte = new BufferedReader(new FileReader(new File("table2.dat")));
 			if (ficTexte == null) {
 				throw new FileNotFoundException("Fichier non trouve: " + fichier);
 			}
@@ -48,7 +51,7 @@ public class LectureDonnees {
 								}
 								compteur++;
 							}
-							galaxy.setDist(Double.parseDouble(mot));
+							galaxy.setDist(Double.parseDouble(mot)*MPC);
 							break;
 						case 28:
 							for (int j = compteur; j < 33; j++) {
@@ -102,7 +105,7 @@ public class LectureDonnees {
 								}
 								compteur++;
 							}
-							galaxy.setMvir(Double.parseDouble(mot));
+							galaxy.setMvir(Double.parseDouble(mot)*TMsun);
 							break;
 						default:
 							compteur++;
