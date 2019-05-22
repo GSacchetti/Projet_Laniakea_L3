@@ -33,8 +33,7 @@ public class AnalyseDonnees {
 		x = x2 - x1;
 		y = y2 - y1;
 		z = z2 - z1;
-		res = Math.sqrt(x * x + y * y);
-		res = Math.sqrt(res * res + z * z);
+		res = Math.sqrt(x * x + y * y+ z * z);
 		return res;
 	}
 
