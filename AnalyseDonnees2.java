@@ -5,6 +5,7 @@ import java.io.IOException;
 public class AnalyseDonnees {
 	final static double G = 6.67408 * Math.pow(10.0, -11.0);
 	final static double MPC = 3.086 * Math.pow(10.0, 22.0);
+	final static double PC = 3.086 * Math.pow(10.0, 16.0);
 	final static double TMsun = 1.9884 * Math.pow(10.0, 42.0);
 	final static int NB = 11508;
 
