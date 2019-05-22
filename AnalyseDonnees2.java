@@ -78,7 +78,7 @@ public class AnalyseDonnees {
 		return res;
 	}
 
-	public static void calculVit(int i, int j, Amas[][] t, int dt) {
+	public static void calculVit(int i, int j, Amas[][] t, double dt) {
 
 		double x, y, z;
 		Vect3 acc = calculAcc(i, j, t);
@@ -93,7 +93,7 @@ public class AnalyseDonnees {
 
 	}
 
-	public static void calculPos(int i, int j, Amas[][] t, int dt) {
+	public static void calculPos(int i, int j, Amas[][] t, double dt) {
 		double x, y, z;
 
 		Vect3 pos = t[i][j].getPos();
@@ -109,7 +109,7 @@ public class AnalyseDonnees {
 
 	}
 
-	public static Amas[][] produitFinal(int dt, int frames) throws IOException {
+	public static Amas[][] produitFinal(double dt, int frames) throws IOException {
 		Amas[][] res = new Amas[frames][NB];
 		LectureDonnees.donnees(res);
 		for (int f = 1; f < frames - 1; f++) {
