@@ -20,6 +20,7 @@ import javax.media.j3d.PositionPathInterpolator;
 import javax.media.j3d.ScaleInterpolator;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
+import javax.media.j3d.ViewPlatform;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
@@ -33,15 +34,18 @@ import com.sun.j3d.utils.geometry.Sphere;
 import com.sun.j3d.utils.geometry.Text2D;
 import com.sun.j3d.utils.universe.PlatformGeometry;
 import com.sun.j3d.utils.universe.SimpleUniverse;
+import com.sun.j3d.utils.universe.ViewingPlatform;
 
 public class Simulation extends Applet{
 	
 
 	private static final long serialVersionUID = 1L;
-	public static final int FRAMERATE = 35;
+	public static final int FRAMERATE = 10;
 	private SimpleUniverse universe = null;
 	private Canvas3D canvas = null;
 	private TransformGroup viewtrans = null;
+	
+	private final static double RESCALING = 1.0*Math.pow(10, 23);
 	
 	public Simulation() {
 		 super.init();
@@ -72,26 +76,29 @@ public class Simulation extends Applet{
 		  viewtrans = universe.getViewingPlatform().getViewPlatformTransform();
 		  
 		  
+		  
+		  
+		  //---------------------------DEPLACEMENT DANS LA SCENE--------------------
+		  Simulation_Navigator_Behaviour sim_nav = new Simulation_Navigator_Behaviour(viewtrans, new Vector3d(0.0f,50.0f,0.0f));
+		  sim_nav.setSchedulingBounds(bounds);
+		  PlatformGeometry pg = new PlatformGeometry();
+		  pg.addChild(sim_nav);
+		  universe.getViewingPlatform().setPlatformGeometry(pg);
+		  
 		  Transform3D t3d = new Transform3D();
 		  t3d.set(new Vector3f(0.0f,50.0f,0.0f));
 		  viewtrans.setTransform(t3d);
-		  
-		  //---------------------------DEPLACEMENT DANS LA SCENE--------------------
-		  KeyNavigatorBehavior keyNavBeh = new KeyNavigatorBehavior(viewtrans);
-		  keyNavBeh.setSchedulingBounds(bounds);
-		  PlatformGeometry pg = new PlatformGeometry();
-		  pg.addChild(keyNavBeh);
-		  universe.getViewingPlatform().setPlatformGeometry(pg);
 
 		 //---------------------------AJOUT DU CONTENU------------------------------
 		 //Ajouter les amas
 		  for(int i = 0; i<Principe.nb_amas;i++){
-			  objRoot.addChild(create_amas(i));
+			 // if(Principe.amas[0][i].getMvir()>Math.pow(10, 40))
+				  objRoot.addChild(create_amas(i));
 		  }
 		  
 		  
 		  
-		  //objRoot.addChild(createLight());
+		  objRoot.addChild(createLight());
 		  objRoot.addChild(createWireCube());
 		  objRoot.addChild(createText2D("MPC : 0",new Vector3d(-50.0f,-53.0f,50.0f)));
 		  objRoot.addChild(createText2D("Year : 61 165 118",new Vector3d(52.0f,0.0f,50.0f)));
@@ -120,22 +127,21 @@ public class Simulation extends Applet{
 			
 			//Creation du chemin : un amas prendra autant de positions successives (keyframes, pas position reelle)
 			//qu'il y a de frame dans la simulation
-			Point3f[] chemin=new Point3f[Principe.duree_sim*FRAMERATE];
-			for(int i = 0; i<Principe.duree_sim*FRAMERATE;i++){
-				
+			Point3f[] chemin=new Point3f[Principe.amas.length];
+			for(int i = 0; i<Principe.amas.length;i++){
 				chemin[i]=new Point3f(
-						(float)Principe.amas[i][amas_index].getPos().getX(),
-						(float)Principe.amas[i][amas_index].getPos().getY(),
-						(float)Principe.amas[i][amas_index].getPos().getZ()
+						(float)(Principe.amas[i][amas_index].getPos().getX() / RESCALING),
+						(float)(Principe.amas[i][amas_index].getPos().getY() / RESCALING),
+						(float)(Principe.amas[i][amas_index].getPos().getZ() / RESCALING)
 						);
 				
 			}
 			
 			//Creer un tableau de correspondance
 			//Divise la totalite des positions des frames sur une echelle de 0 a 1
-			float[] timePosition= new float[Principe.duree_sim*FRAMERATE];
-			for(int i = 0; i<Principe.duree_sim*FRAMERATE;i++){
-				timePosition[i] = ((float)i) *(1.0f/(float)(Principe.duree_sim*FRAMERATE-1));
+			float[] timePosition= new float[Principe.amas.length];
+			for(int i = 0; i<Principe.amas.length;i++){
+				timePosition[i] = ((float)i) *(1.0f/(float)(Principe.amas.length-1));
 				//La position a t = i est donc ( i * echelle de temps separant deux frames)
 				
 			}
@@ -153,7 +159,7 @@ public class Simulation extends Applet{
 			//On applique l'interpolateur a la branche.
 			tg.addChild(interpol);
 			//--------------------------------RENDERING------------------------------------
-			Sphere sphere = new Sphere((float)Principe.amas[0][amas_index].getMvir()/2 +0.15f);
+			Sphere sphere = new Sphere((float)(Math.sqrt(Principe.amas[0][amas_index].getMvir()/(5*Math.pow(10, 45)))) +0.05f);
 			
 			
 			//Considerations esthetiques
@@ -164,7 +170,7 @@ public class Simulation extends Applet{
 			mat.setAmbientColor(new Color3f((float)Principe.amas[0][amas_index].getMvir(),1-(float)Principe.amas[0][amas_index].getMvir(),0.1f));
 			mat.setDiffuseColor(new Color3f((float)Principe.amas[0][amas_index].getMvir(),1-(float)Principe.amas[0][amas_index].getMvir(),0.1f));
 			mat.setSpecularColor(new Color3f((float)Principe.amas[0][amas_index].getMvir(),1-(float)Principe.amas[0][amas_index].getMvir(),0.1f));
-			mat.setEmissiveColor(new Color3f((float)Principe.amas[0][amas_index].getMvir()/2,(1-(float)Principe.amas[0][amas_index].getMvir())/2,0.1f));
+			mat.setEmissiveColor(new Color3f(1.0f,1.0f,0.1f));
 			app.setMaterial(mat);	
 			  
 			sphere.setAppearance(app);
