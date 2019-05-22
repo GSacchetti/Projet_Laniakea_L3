@@ -136,7 +136,7 @@ public class LectureDonnees {
 
 	public static void main(String[] args) throws IOException {
 		int f = 200;
-		Amas[][] tab = AnalyseDonnees.produitFinal((int)(1.26144*Math.pow(10, 15)), f);//1.26144*Math.pow(10, 15) == 40 millions d annees
+		Amas[][] tab = AnalyseDonnees.produitFinal(1.26144*Math.pow(10, 15), f);//1.26144*Math.pow(10, 15) == 40 millions d annees
 		for (int i = 0; i < f; i++) {
 			for (int j = 0; j < 2; j++) {
 				System.out.println("frame : "+i+" amas : "+j+" -> "+tab[i][j].getPos().getX()+" "+tab[i][j].getPos().getY()+" "+tab[i][j].getPos().getZ());
