@@ -5,7 +5,6 @@ import java.io.IOException;
 public class AnalyseDonnees {
 	final static double G = 6.67408 * Math.pow(10.0, -11.0);
 	final static double MPC = 3.086 * Math.pow(10.0, 22.0);
-	//final static double PC = 3.086 * Math.pow(10.0, 16.0);
 	final static double TMsun = 1.9884 * Math.pow(10.0, 42.0);
 	final static int NB = 11508;
 
@@ -119,6 +118,7 @@ public class AnalyseDonnees {
 				calculPos(f, j, res, dt);
 				res[f + 1][j] = Amas.copie(res[f][j]);
 			}
+			System.out.println(f+" / "+(frames-1)); // permet de voir l'avancement
 		}
 		for (int j = 0; j < NB; j++) {
 			res[frames - 1][j].setPos(Vect3.copie(res[frames - 1][j].getPos2()));
