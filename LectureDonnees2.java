@@ -113,7 +113,7 @@ public class LectureDonnees {
 						}
 					}
 					galaxy.setPos(AnalyseDonnees.calculCoordonnees(galaxy));
-					galaxy.setPos2(AnalyseDonnees.calculCoordonnees(galaxy));
+					galaxy.setPos2(Vect3.copie(galaxy.getPos()));
 					tab[0][c] = galaxy;
 					tab[1][c] = Amas.copie(galaxy);
 					c++;
@@ -135,11 +135,12 @@ public class LectureDonnees {
 	}
 
 	public static void main(String[] args) throws IOException {
-		int f = 200;
+		int f = 10;
 		Amas[][] tab = AnalyseDonnees.produitFinal(1.26144*Math.pow(10, 15), f);//1.26144*Math.pow(10, 15) == 40 millions d annees
-		for (int i = 0; i < f; i++) {
-			for (int j = 0; j < 2; j++) {
-				System.out.println("frame : "+i+" amas : "+j+" -> "+tab[i][j].getPos().getX()+" "+tab[i][j].getPos().getY()+" "+tab[i][j].getPos().getZ());
+		for (int i = 0; i < f; i++) { // indice de la frame
+			for (int j = 0; j < 1; j++) { // indice de l'amas
+				System.out.println(tab[i][j].getNest()+", frame : "+i+", amas : "+j+" -> "+((tab[i][j].getPos().getX())/(1*Math.pow(10, 19)))+" "+((tab[i][j].getPos().getY())/(1*Math.pow(10, 19)))+" "+((tab[i][j].getPos().getZ())/(1*Math.pow(10, 19))));
+				System.out.println("vitesse : "+tab[i][j].getVit().getX()+" "+tab[i][j].getVit().getY()+" "+tab[i][j].getVit().getZ());
 				System.out.println("--------------------");
 		}
 
