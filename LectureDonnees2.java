@@ -51,7 +51,11 @@ public class LectureDonnees {
 								}
 								compteur++;
 							}
+							if(Double.parseDouble(mot)== 0.0) {
+								galaxy.setDist(0.01*MPC);
+							}else {
 							galaxy.setDist(Double.parseDouble(mot)*MPC);
+							}
 							break;
 						case 28:
 							for (int j = compteur; j < 33; j++) {
