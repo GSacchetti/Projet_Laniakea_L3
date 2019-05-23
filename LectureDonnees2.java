@@ -111,6 +111,17 @@ public class LectureDonnees {
 							}
 							galaxy.setMvir(Double.parseDouble(mot)*TMsun);
 							break;
+						case 159:
+							for (int j = compteur; j < 169; j++) {
+								if (!Character.isWhitespace(charArray[j])) {
+									mot += charArray[j];
+								}
+								compteur++;
+							}
+							if (galaxy.getMvir() == 0.0) {
+								galaxy.setMvir(Double.parseDouble(mot) * TMsun);
+							}
+							break;
 						default:
 							compteur++;
 							break;
@@ -144,7 +155,7 @@ public class LectureDonnees {
 		for (int i = 0; i < f; i++) { // indice de la frame
 			for (int j = 0; j < 1; j++) { // indice de l'amas
 				System.out.println(tab[i][j].getNest()+", frame : "+i+", amas : "+j+" -> "+((tab[i][j].getPos().getX())/(1*Math.pow(10, 19)))+" "+((tab[i][j].getPos().getY())/(1*Math.pow(10, 19)))+" "+((tab[i][j].getPos().getZ())/(1*Math.pow(10, 19))));
-				System.out.println("vitesse : "+tab[i][j].getVit().getX()+" "+tab[i][j].getVit().getY()+" "+tab[i][j].getVit().getZ());
+				System.out.println("			vitesse : "+tab[i][j].getVit().getX()+" "+tab[i][j].getVit().getY()+" "+tab[i][j].getVit().getZ());
 				System.out.println("--------------------");
 		}
 
