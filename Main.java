@@ -21,8 +21,7 @@ public class Main {
 	
 	
 	
-	public static void main(String args[]) throws IOException{
-		lancer_calcul(0,10);
+	public static void main(String args[]){
 		//Premiere fenetre permettant de rentrer les donnees necessaires au calcul
 		//Met "duree_simulation", "annee_fin" et "delta_t" a jour via AWT events
 		request_frame = new Fenetre();
