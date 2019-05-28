@@ -1,9 +1,10 @@
-package Visualisation_2;
+package Visualisation;
 
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.text.DecimalFormat;
 import java.util.Vector;
 
 import javax.media.j3d.Alpha;
@@ -36,6 +37,7 @@ import com.sun.j3d.utils.universe.PlatformGeometry;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 import com.sun.j3d.utils.universe.ViewingPlatform;
 
+//Classe dediee a la visualisation du calcul realisee par Donnes.AnalyseDonnees
 public class Simulation extends Applet{
 	
 
@@ -44,8 +46,21 @@ public class Simulation extends Applet{
 	private SimpleUniverse universe = null;
 	private Canvas3D canvas = null;
 	private TransformGroup viewtrans = null;
+	private BranchGroup root;
 	
+	//Remise a echelle de la simulation
 	private final static double RESCALING = 1.0*Math.pow(10, 23);
+	//Taille du cube contenant la simulation
+	private final static float SIMULATION_SIZE = 50.0f;
+	//Coordonnees d'explusion d'un objet sortant du cube
+	private final static float EXPULSION_RANGE = Float.MAX_VALUE;
+	//Masse limite d'affichage des amas
+	private static double MASS_LIMIT = 0.0;
+	//Masse maximale existante dans les donnees
+	private static double MASS_MAX = 5.859151867440001*Math.pow(10, 46);
+	
+	private static int avecmasse = 0;
+	private static int sansmasse = 0;
 	
 	public Simulation() {
 		 super.init();
@@ -58,17 +73,20 @@ public class Simulation extends Applet{
 		  
 		 universe = new SimpleUniverse(canvas);
 
-		 BranchGroup scene = createSceneGraph();
+		 root = createSceneGraph();
 		 universe.getViewingPlatform().setNominalViewingTransform();
 		 universe.getViewer().getView().setBackClipDistance(1000.0);
-		 universe.addBranchGraph(scene);
+		 universe.addBranchGraph(root);
 		 //end of 3D setup	  
 
-		  add(canvas);		  
+		 
+		  add(canvas);	
+		  ((Simulation_Navigator_Behaviour)(universe.getViewingPlatform().getPlatformGeometry().getChild(0))).keyNavigator.integrateTransformChanges();
 		 }
 	 
 	
 	//Initialisation de la scene 3D
+	//Retourne une branch contenant l'integralite des objets contenus dans la scene
 	 private BranchGroup createSceneGraph() {
 		  BranchGroup objRoot = new BranchGroup();
 		  BoundingSphere bounds = new BoundingSphere(new Point3d(), 100.0);
@@ -79,7 +97,7 @@ public class Simulation extends Applet{
 		  
 		  
 		  //---------------------------DEPLACEMENT DANS LA SCENE--------------------
-		  Simulation_Navigator_Behaviour sim_nav = new Simulation_Navigator_Behaviour(viewtrans, new Vector3d(0.0f,50.0f,0.0f));
+		  Simulation_Navigator_Behaviour sim_nav = new Simulation_Navigator_Behaviour(viewtrans, new Vector3d(50.0f,50000.0f,50.0f));
 		  sim_nav.setSchedulingBounds(bounds);
 		  PlatformGeometry pg = new PlatformGeometry();
 		  pg.addChild(sim_nav);
@@ -87,22 +105,32 @@ public class Simulation extends Applet{
 		  
 		  Transform3D t3d = new Transform3D();
 		  t3d.set(new Vector3f(0.0f,50.0f,0.0f));
+		  t3d.transform(new Vector3f(0.0f,50.0f,0.0f));
 		  viewtrans.setTransform(t3d);
 
 		 //---------------------------AJOUT DU CONTENU------------------------------
 		 //Ajouter les amas
 		  for(int i = 0; i<Principe.nb_amas;i++){
-			 // if(Principe.amas[0][i].getMvir()>Math.pow(10, 40))
+			  if(Principe.amas[0][i].getMvir()>MASS_LIMIT){
 				  objRoot.addChild(create_amas(i));
+			  		avecmasse++;
+			  }
+			  else{
+				  sansmasse++;
+			  }
 		  }
 		  
-		  
+		  System.out.println("Total des objets representes :" + (avecmasse));
+		  System.out.println("	- Superieur a la masse limite : " + avecmasse);
+		  System.out.println("	- Inferieur a la masse limite : " + sansmasse);
 		  
 		  objRoot.addChild(createLight());
 		  objRoot.addChild(createWireCube());
-		  objRoot.addChild(createText2D("MPC : 0",new Vector3d(-50.0f,-53.0f,50.0f)));
-		  objRoot.addChild(createText2D("Year : 61 165 118",new Vector3d(52.0f,0.0f,50.0f)));
-
+		  
+		  //Texte a afficher pour echelle de la simulation
+		  objRoot.addChild(createText2D(("Unit : \n" + (RESCALING*10.0)) + " m",new Vector3d(-50.0f,-56.0f,50.0f)));
+		  objRoot.addChild(createText2D(("Total : \n" + (RESCALING*100.0)) + " m³",new Vector3d(52.0f,0.0f,50.0f)));
+		 
 		  return objRoot;
 		 }
 
@@ -128,12 +156,38 @@ public class Simulation extends Applet{
 			//Creation du chemin : un amas prendra autant de positions successives (keyframes, pas position reelle)
 			//qu'il y a de frame dans la simulation
 			Point3f[] chemin=new Point3f[Principe.amas.length];
+			float x, y,z;
 			for(int i = 0; i<Principe.amas.length;i++){
-				chemin[i]=new Point3f(
-						(float)(Principe.amas[i][amas_index].getPos().getX() / RESCALING),
-						(float)(Principe.amas[i][amas_index].getPos().getY() / RESCALING),
-						(float)(Principe.amas[i][amas_index].getPos().getZ() / RESCALING)
-						);
+				
+				x = (float)(Principe.amas[i][amas_index].getPos().getX() / RESCALING);
+				y = (float)(Principe.amas[i][amas_index].getPos().getY() / RESCALING);
+				z = (float)(Principe.amas[i][amas_index].getPos().getZ() / RESCALING);
+				
+				//X REG
+				if( x > SIMULATION_SIZE){
+					x = EXPULSION_RANGE;
+				}
+				if( x < -SIMULATION_SIZE){
+					x = -EXPULSION_RANGE;
+				}
+				
+				//Y REG
+				if( y > SIMULATION_SIZE){
+					y = EXPULSION_RANGE;
+				}
+				if( y < -SIMULATION_SIZE){
+					y = -EXPULSION_RANGE;
+				}
+				
+				//Z REG
+				if( z > SIMULATION_SIZE){
+					z = EXPULSION_RANGE;
+				}
+				if( z < -SIMULATION_SIZE){
+					z = -EXPULSION_RANGE;
+				}
+				
+				chemin[i]=new Point3f(x,y,z);
 				
 			}
 			
@@ -155,29 +209,35 @@ public class Simulation extends Applet{
 			BoundingSphere bounds=new BoundingSphere();
 			bounds.setRadius(500.0);
 			interpol.setSchedulingBounds(bounds);
+			interpol.setName("interpolateur");
 			
-			//On applique l'interpolateur a la branche.
+			//On applique l'interpolateur a la branche. (BRANCH CHILD 0)
 			tg.addChild(interpol);
 			//--------------------------------RENDERING------------------------------------
-			Sphere sphere = new Sphere((float)(Math.sqrt(Principe.amas[0][amas_index].getMvir()/(5*Math.pow(10, 45)))) +0.05f);
 			
+			double masse = Principe.amas[0][amas_index].getMvir();
+			float mass_visual = (float)(Math.sqrt(Math.sqrt(masse/MASS_MAX)));
+			Sphere sphere = new Sphere(mass_visual +0.05f);
+
 			
 			//Considerations esthetiques
 			//Ne semblent avoir que tres peu d'impact sur la performance de rendu de la simulation
 			Appearance app = new Appearance();
-			  
+				
+			mass_visual = (float)(Math.sqrt(Math.sqrt(Math.sqrt(masse/MASS_MAX))));
+			
 			Material mat = new Material();
-			mat.setAmbientColor(new Color3f((float)Principe.amas[0][amas_index].getMvir(),1-(float)Principe.amas[0][amas_index].getMvir(),0.1f));
-			mat.setDiffuseColor(new Color3f((float)Principe.amas[0][amas_index].getMvir(),1-(float)Principe.amas[0][amas_index].getMvir(),0.1f));
-			mat.setSpecularColor(new Color3f((float)Principe.amas[0][amas_index].getMvir(),1-(float)Principe.amas[0][amas_index].getMvir(),0.1f));
-			mat.setEmissiveColor(new Color3f(1.0f,1.0f,0.1f));
+			mat.setAmbientColor(new Color3f(mass_visual,1-mass_visual,0.1f));
+			mat.setDiffuseColor(new Color3f(mass_visual,1-mass_visual,0.1f));
+			mat.setSpecularColor(new Color3f(mass_visual,1-mass_visual,0.1f));
+			mat.setEmissiveColor(new Color3f(mass_visual/2,(1-mass_visual)/2,0.1f));
 			app.setMaterial(mat);	
 			  
 			sphere.setAppearance(app);
 			
 			
 			//------------------------------BRANCHGROUP COMPILATION---------------------------
-			//Ajouter le Transform Group contenant l'objet a l'interpolateur
+			//Ajouter le Transform Group contenant l'objet a l'interpolateur (BRANCH CHILD 1)
 			tg.addChild(tg2);
 			//Ajouter la sphere representant un corps au TransformGroup inferieur
 			tg2.addChild(sphere);
@@ -208,7 +268,7 @@ public class Simulation extends Applet{
 		 }
 		 
 		//Un simple cube pour contenir les objets de la simulation.
-		//Cree un cube de cote 100
+		//Cree un cube de cote SIMULATION_SIZE*2
 		private Cube createWireCube(){
 			 Appearance app = new Appearance();
 			  Material mat = new Material();
@@ -220,7 +280,7 @@ public class Simulation extends Applet{
 			  polyAttrbutes.setPolygonMode( PolygonAttributes.POLYGON_LINE );
 			  polyAttrbutes.setCullFace(PolygonAttributes.CULL_NONE);
 			  app.setPolygonAttributes(polyAttrbutes);
-			  Cube cc = new Cube(50);
+			  Cube cc = new Cube(SIMULATION_SIZE);
 			  cc.setAppearance(app);
 			  
 			  return cc;
@@ -232,11 +292,29 @@ public class Simulation extends Applet{
 			Transform3D t3d = new Transform3D();
 			t3d.setTranslation(pos);
 			
-			Text2D txt = new Text2D(content,new Color3f(0.9f,0.9f,0.9f),"TimesRoman", 500, 10);
+			Text2D txt = new Text2D(content,new Color3f(0.9f,0.9f,0.9f),"Ludica", 500, 10);
 			tg.setTransform(t3d);
 			tg.addChild(txt);
 			objRoot.addChild(tg);
 			return objRoot;
+		}
+		
+		public void setPause(boolean pause_state){
+			for(int i = 0;i<this.root.numChildren();i++){
+				if(root.getChild(i).getName()!=null)
+				if(root.getChild(i).getName().equals("amas")){
+					((PositionPathInterpolator)(((TransformGroup)  ((BranchGroup)root.getChild(i)).getChild(0))  .getChild(0))).setEnable(!pause_state);
+				}
+			}
+		}
+		
+		public void setAlpha(float alpha){
+			for(int i = 0;i<this.root.numChildren();i++){
+				if(root.getChild(i).getName()!=null)
+				if(root.getChild(i).getName().equals("amas")){
+					((PositionPathInterpolator)(((TransformGroup)  ((BranchGroup)root.getChild(i)).getChild(0))  .getChild(0))).computeTransform(alpha, new Transform3D());
+				}
+			}
 		}
 
 }
