@@ -40,9 +40,8 @@ import com.sun.j3d.utils.universe.ViewingPlatform;
 //Classe dediee a la visualisation du calcul realisee par Donnes.AnalyseDonnees
 public class Simulation extends Applet{
 	
-
+	
 	private static final long serialVersionUID = 1L;
-	public static final int FRAMERATE = 10;
 	private SimpleUniverse universe = null;
 	private Canvas3D canvas = null;
 	private TransformGroup viewtrans = null;
@@ -55,9 +54,12 @@ public class Simulation extends Applet{
 	//Coordonnees d'explusion d'un objet sortant du cube
 	private final static float EXPULSION_RANGE = Float.MAX_VALUE;
 	//Masse limite d'affichage des amas
-	private static double MASS_LIMIT = 0.0;
+	private static double MASS_LIMIT = -1.0;
 	//Masse maximale existante dans les donnees
 	private static double MASS_MAX = 5.859151867440001*Math.pow(10, 46);
+	
+	//Amas selectionne pour etre mis en evidence lors de la simulation
+	private static int viewable_cluster = 1;
 	
 	private static int avecmasse = 0;
 	private static int sansmasse = 0;
@@ -81,7 +83,7 @@ public class Simulation extends Applet{
 
 		 
 		  add(canvas);	
-		  ((Simulation_Navigator_Behaviour)(universe.getViewingPlatform().getPlatformGeometry().getChild(0))).keyNavigator.integrateTransformChanges();
+		 setViewerPosition(new Vector3f(0.0f,0.0f,250.0f));
 		 }
 	 
 	
@@ -103,10 +105,6 @@ public class Simulation extends Applet{
 		  pg.addChild(sim_nav);
 		  universe.getViewingPlatform().setPlatformGeometry(pg);
 		  
-		  Transform3D t3d = new Transform3D();
-		  t3d.set(new Vector3f(0.0f,50.0f,0.0f));
-		  t3d.transform(new Vector3f(0.0f,50.0f,0.0f));
-		  viewtrans.setTransform(t3d);
 
 		 //---------------------------AJOUT DU CONTENU------------------------------
 		 //Ajouter les amas
@@ -217,20 +215,33 @@ public class Simulation extends Applet{
 			
 			double masse = Principe.amas[0][amas_index].getMvir();
 			float mass_visual = (float)(Math.sqrt(Math.sqrt(masse/MASS_MAX)));
-			Sphere sphere = new Sphere(mass_visual +0.05f);
-
+			
+			Sphere sphere;
+			if(masse>0.0){
+				sphere = new Sphere(mass_visual +0.05f);
+			}
+			else{
+				sphere = new Sphere(0.05f,1,5);
+			}
 			
 			//Considerations esthetiques
 			//Ne semblent avoir que tres peu d'impact sur la performance de rendu de la simulation
 			Appearance app = new Appearance();
-				
+			
+			//Variable relative a la representation d'un amas
+			//Calculee a partir de la racine cubique de sa masse sur la plus grande masse existante
 			mass_visual = (float)(Math.sqrt(Math.sqrt(Math.sqrt(masse/MASS_MAX))));
 			
 			Material mat = new Material();
 			mat.setAmbientColor(new Color3f(mass_visual,1-mass_visual,0.1f));
 			mat.setDiffuseColor(new Color3f(mass_visual,1-mass_visual,0.1f));
 			mat.setSpecularColor(new Color3f(mass_visual,1-mass_visual,0.1f));
-			mat.setEmissiveColor(new Color3f(mass_visual/2,(1-mass_visual)/2,0.1f));
+			mat.setEmissiveColor(new Color3f(mass_visual/(2-mass_visual),(1-mass_visual)/(2-mass_visual),0.1f));
+			
+			//Mise en evidence d'un amas selectionne
+			if(viewable_cluster == amas_index){
+				mat.setEmissiveColor(new Color3f(0.7f,0,1));
+			}
 			app.setMaterial(mat);	
 			  
 			sphere.setAppearance(app);
@@ -269,7 +280,7 @@ public class Simulation extends Applet{
 		 
 		//Un simple cube pour contenir les objets de la simulation.
 		//Cree un cube de cote SIMULATION_SIZE*2
-		private Cube createWireCube(){
+		private Simulation_Cube createWireCube(){
 			 Appearance app = new Appearance();
 			  Material mat = new Material();
 			  mat.setAmbientColor(new Color3f(0.9f,0.9f,0.9f));
@@ -280,12 +291,18 @@ public class Simulation extends Applet{
 			  polyAttrbutes.setPolygonMode( PolygonAttributes.POLYGON_LINE );
 			  polyAttrbutes.setCullFace(PolygonAttributes.CULL_NONE);
 			  app.setPolygonAttributes(polyAttrbutes);
-			  Cube cc = new Cube(SIMULATION_SIZE);
+			  Simulation_Cube cc = new Simulation_Cube(SIMULATION_SIZE);
 			  cc.setAppearance(app);
 			  
 			  return cc;
 		}
 		
+		/**
+		 * Cree un text en deux dimensions a l'endroit indique
+		 * @param content La String a afficher
+		 * @param pos position du texte
+		 * @return
+		 */
 		private BranchGroup createText2D(String content,Vector3d pos){
 			BranchGroup objRoot = new BranchGroup();
 			TransformGroup tg = new TransformGroup();
@@ -299,6 +316,13 @@ public class Simulation extends Applet{
 			return objRoot;
 		}
 		
+		/**
+		 * Met en arret tout les interpolateurs de position de la simulation
+		 * (ou les remet en marche de la meme maniere.)
+		 * Pour des raisons inconnues, la remise en marche est dramatiquement plus lente
+		 * que la mise en arret.
+		 * @param pause_state
+		 */
 		public void setPause(boolean pause_state){
 			for(int i = 0;i<this.root.numChildren();i++){
 				if(root.getChild(i).getName()!=null)
@@ -315,6 +339,16 @@ public class Simulation extends Applet{
 					((PositionPathInterpolator)(((TransformGroup)  ((BranchGroup)root.getChild(i)).getChild(0))  .getChild(0))).computeTransform(alpha, new Transform3D());
 				}
 			}
+		}
+		
+		/**
+		 * Permet de mettre le ViewerPlatform a l'endroit desire
+		 * @param v3
+		 */
+		public void setViewerPosition(Vector3f v3){
+			  Transform3D t3d = new Transform3D();
+			  t3d.setTranslation(v3);
+			  viewtrans.setTransform(t3d);
 		}
 
 }
