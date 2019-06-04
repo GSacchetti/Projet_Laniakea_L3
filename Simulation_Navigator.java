@@ -1,4 +1,4 @@
-package Visualisation_2;
+package Visualisation;
 
 import java.awt.event.KeyEvent;
 
@@ -16,6 +16,7 @@ import javax.vecmath.Vector3d;
  */
 public class Simulation_Navigator {
 
+	private boolean first = true;
 	private Vector3d navVec;
 	private long time;
 
@@ -128,8 +129,8 @@ public class Simulation_Navigator {
 		time = System.currentTimeMillis();
 	}
 
-	public Simulation_Navigator(TransformGroup targetTG, Vector3d init_pos) {
-		this.targetTG = targetTG;
+	public Simulation_Navigator(TransformGroup TTG, Vector3d init_pos) {
+		this.targetTG = TTG;
 		targetTG.getTransform(nominal);
 
 		mmx = 128.0;
@@ -163,8 +164,8 @@ public class Simulation_Navigator {
 
 		// Create Timer here.
 		time = System.currentTimeMillis();
-		vpTrans.set(vpQuat, init_pos, vpScale);
-		targetTG.setTransform(vpTrans);
+
+
 	}
 
 	private long getDeltaTime() {
@@ -419,10 +420,12 @@ public class Simulation_Navigator {
 			// Extract the position, quaterion, and scale from the nominal
 			// transform
 			vpScale = nominal.get(vpQuat, vpPos);
+			vpPos.z = 250.0f;
 		}
 
 		/* Final update of view platform */
 		// Put the transform back into the transform group.
+
 		vpTrans.set(vpQuat, vpPos, vpScale);
 		targetTG.setTransform(vpTrans);
 	}
@@ -431,7 +434,8 @@ public class Simulation_Navigator {
 	 * Resets the keyboard navigation velocity to 0.
 	 */
 	private void resetVelocity() {
-		navVec.x = navVec.y = navVec.z = 0.0;
+		navVec.x = navVec.y = 0.0;
+		navVec.z = 0;
 	}
 
 	/**

@@ -54,7 +54,7 @@ public class Simulation extends Applet{
 	//Coordonnees d'explusion d'un objet sortant du cube
 	private final static float EXPULSION_RANGE = Float.MAX_VALUE;
 	//Masse limite d'affichage des amas
-	private static double MASS_LIMIT = -1.0;
+	private static double MASS_LIMIT = 1.0;
 	//Masse maximale existante dans les donnees
 	private static double MASS_MAX = 5.859151867440001*Math.pow(10, 46);
 	
@@ -74,9 +74,9 @@ public class Simulation extends Applet{
 
 		  
 		 universe = new SimpleUniverse(canvas);
-
-		 root = createSceneGraph();
 		 universe.getViewingPlatform().setNominalViewingTransform();
+		 
+		 root = createSceneGraph();
 		 universe.getViewer().getView().setBackClipDistance(1000.0);
 		 universe.addBranchGraph(root);
 		 //end of 3D setup	  
@@ -84,6 +84,7 @@ public class Simulation extends Applet{
 		 
 		  add(canvas);	
 		 setViewerPosition(new Vector3f(0.0f,0.0f,250.0f));
+		 
 		 }
 	 
 	
@@ -94,8 +95,6 @@ public class Simulation extends Applet{
 		  BoundingSphere bounds = new BoundingSphere(new Point3d(), 100.0);
 
 		  viewtrans = universe.getViewingPlatform().getViewPlatformTransform();
-		  
-		  
 		  
 		  
 		  //---------------------------DEPLACEMENT DANS LA SCENE--------------------
@@ -133,9 +132,11 @@ public class Simulation extends Applet{
 		 }
 
 	 
-	 	//Cree une branche contenant la representation d'un amas
-	 	//Prend en parametre l'indice de ce dernier dans le tableau rendu par l'exploitation des donnees
-	 	//A l'objet rendu est integre le chemin qu'il suivra au cours de la simulation
+	 	/**
+	 	* Cree une branche contenant la representation d'un amas
+	 	* Prend en parametre l'indice de ce dernier dans le tableau rendu par l'exploitation des donnees
+	 	* A l'objet rendu est integre le chemin qu'il suivra au cours de la simulation
+	 	*/
 	 	private BranchGroup create_amas(int amas_index){
 	 		BranchGroup objRoot = new BranchGroup();
 			TransformGroup tg = new TransformGroup();
@@ -211,6 +212,7 @@ public class Simulation extends Applet{
 			
 			//On applique l'interpolateur a la branche. (BRANCH CHILD 0)
 			tg.addChild(interpol);
+			
 			//--------------------------------RENDERING------------------------------------
 			
 			double masse = Principe.amas[0][amas_index].getMvir();
@@ -266,9 +268,10 @@ public class Simulation extends Applet{
 	 	
 	 	
 
-		//Ajouter de la lumiere
-	 	//Facultatif puisque esthetique
-	 	//Faible impact sur les performances de la simulation
+		/**Ajouter de la lumiere
+	 	*Facultatif puisque esthetique
+	 	*Faible impact sur les performances de la simulation
+	 	*/
 		 private Light createLight() {
 			 PointLight light = new PointLight(new Color3f(1.0f,
 					    1.0f, 1.0f), new Point3f(0.0f,0.0f,0.0f),new Point3f(0.0f,0.0f,0.0f));
@@ -278,8 +281,9 @@ public class Simulation extends Applet{
 					  return light;
 		 }
 		 
-		//Un simple cube pour contenir les objets de la simulation.
-		//Cree un cube de cote SIMULATION_SIZE*2
+		/**Un simple cube pour contenir les objets de la simulation.
+		*Cree un cube de cote SIMULATION_SIZE*2
+		*/
 		private Simulation_Cube createWireCube(){
 			 Appearance app = new Appearance();
 			  Material mat = new Material();
@@ -295,6 +299,21 @@ public class Simulation extends Applet{
 			  cc.setAppearance(app);
 			  
 			  return cc;
+		}
+		
+		/**Un simple cube pour contenir les objets de la simulation.
+		*Cree un cube de cote SIMULATION_SIZE*2
+		*/
+		private Simulation_Vector createVector(double scale){
+			 Appearance app = new Appearance();
+			 PolygonAttributes polyAttrbutes = new PolygonAttributes();
+			 polyAttrbutes.setPolygonMode( PolygonAttributes.POLYGON_LINE );
+			 polyAttrbutes.setCullFace(PolygonAttributes.CULL_NONE);
+			 app.setPolygonAttributes(polyAttrbutes);
+			 Simulation_Vector sv = new Simulation_Vector(scale);
+			 sv.setAppearance(app);
+			  
+			 return sv;
 		}
 		
 		/**
@@ -350,5 +369,7 @@ public class Simulation extends Applet{
 			  t3d.setTranslation(v3);
 			  viewtrans.setTransform(t3d);
 		}
+		
+
 
 }

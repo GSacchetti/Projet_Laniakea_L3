@@ -1,4 +1,4 @@
-package Visualisation_2;
+package Visualisation;
 
 import java.awt.AWTEvent;
 import java.awt.Component;
@@ -30,7 +30,7 @@ public class Simulation_Navigator_Behaviour extends Behavior implements KeyListe
     private WakeupCriterion[] warray = { w1, w2, w3 };
     private WakeupCondition w = new WakeupOr(warray);
     private KeyEvent eventKey;
-    private Simulation_Navigator keyNavigator;
+    public Simulation_Navigator keyNavigator;
     private boolean listener = false;
 
     private LinkedList eventq;
