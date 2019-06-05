@@ -1,6 +1,11 @@
 package Main;
 
+import java.awt.Frame;
+import java.awt.Toolkit;
 import java.io.IOException;
+
+import Interface_Utilisateur.Fenetre;
+import Visualisation.Simulation_Frame;
 
 
 //Centralise toutes les donnees interagissant dans la simulation
@@ -18,10 +23,12 @@ public class Main {
 	//AWT
 	public static Fenetre request_frame;
 	public static Visualisation.Simulation simulation;
+	public static Visualisation.Simulation_Frame simulation_frame;
 	
 	
 	
 	public static void main(String args[]){
+		System.out.println("Lancement du programme :");
 		//Premiere fenetre permettant de rentrer les donnees necessaires au calcul
 		//Met "duree_simulation", "annee_fin" et "delta_t" a jour via AWT events
 		request_frame = new Fenetre();
@@ -34,13 +41,13 @@ public class Main {
 	 * @param nombre_frame nombre total de frame de la simulation
 	 * @throws IOException
 	 */
-	public static void lancer_calcul(double dt, int nombre_frame) throws IOException{
-		if(dt <= 0 || nombre_frame <= 0){
+	public static void lancer_calcul() throws IOException{
+		if(delta_t <= 0 || duree_simulation <= 0){
 			System.out.println("Parametres pour le lancement du calcul de la simulation incorrects");
 			System.out.println("Voir request_frame");
 			System.exit(0);
 		}
-		amas = Donnees.AnalyseDonnees.produitFinal(dt, nombre_frame);
+		amas = Donnees.AnalyseDonnees.produitFinal(delta_t,duree_simulation);
 	}
 	
 	/**
@@ -55,6 +62,11 @@ public class Main {
 			System.exit(0);
 		}
 		simulation = new Visualisation.Simulation();
+		
+		java.awt.Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int width = (int)screenSize.getWidth();
+		int height = (int)screenSize.getHeight();
+		Frame f = new Simulation_Frame(simulation, width, height, false);
 	}
 	
 }
