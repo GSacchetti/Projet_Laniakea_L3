@@ -105,7 +105,7 @@ public class LectureDonnees {
 								}
 								compteur++;
 							}
-							galaxy.setVgsr(Integer.parseInt(mot));
+							galaxy.setVls(Integer.parseInt(mot));
 							break;
 						case 149:
 							for (int j = compteur; j < 158; j++) {
@@ -132,7 +132,7 @@ public class LectureDonnees {
 							break;
 						}
 					}
-					galaxy.setPos(AnalyseDonnees.calculCoordonnees(galaxy));
+					galaxy.setPos(calculCoordonnees(galaxy));
 					galaxy.setVit(vitesseInit(galaxy)); // vitesse initale ajout
 					tab[0][c] = galaxy;
 					c++;
@@ -156,6 +156,39 @@ public class LectureDonnees {
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
+	}
+	/**
+	 * Calcule le vecteur position d un amas à partir de sa latitude, sa longitude et de sa distance
+	 * @param amas
+	 * @return Vecteur position initial
+	 */
+	public static Vect3 calculCoordonnees(Amas amas) {
+		Vect3 vectPos = new Vect3(0, 0, 0);
+		
+		double glon = amas.getGlon();
+		double glat = amas.getGlat();
+		double distance = amas.getDist();
+
+		vectPos.setX(distance * (Math.cos(Math.toRadians(glat))) * (Math.sin(Math.toRadians(glon))));
+		vectPos.setY(distance * (Math.cos(Math.toRadians(glat))) * (Math.cos(Math.toRadians(glon))));
+		vectPos.setZ(distance * (Math.sin(Math.toRadians(glat))));
+		
+		return vectPos;
+	}
+	
+	/**
+	 * Calcule le vecteur vitesse propre d un amas pour initialiser sa vitesse a t = 0
+	 * @param amas
+	 * @return
+	 */
+	public static Vect3 vitesseInit(Amas amas) {
+		double vx, vy, vz;
+		
+		vx = (amas.getPos().getX()/amas.getDist())*(amas.getVls()-Math.abs((VAR * amas.getPos().getX())))*1000;
+		vy = (amas.getPos().getY()/amas.getDist())*(amas.getVls()-Math.abs((VAR * amas.getPos().getY())))*1000;
+		vz = (amas.getPos().getZ()/amas.getDist())*(amas.getVls()-Math.abs((VAR * amas.getPos().getZ())))*1000;
+		
+		return new Vect3(vx,vy,vz);
 	}
 
 	public static void main(String[] args) throws IOException {
