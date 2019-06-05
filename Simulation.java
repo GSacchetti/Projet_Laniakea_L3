@@ -48,7 +48,8 @@ public class Simulation extends Applet{
 	private BranchGroup root;
 	
 	//Remise a echelle de la simulation
-	private final static double RESCALING = 1.0*Math.pow(10, 23);
+	private static double RESCALING = 1.0*Math.pow(10, 23);
+	private static double PARSEC = 3.086*Math.pow(10, 22);
 	//Taille du cube contenant la simulation
 	private final static float SIMULATION_SIZE = 50.0f;
 	//Coordonnees d'explusion d'un objet sortant du cube
@@ -107,8 +108,8 @@ public class Simulation extends Applet{
 
 		 //---------------------------AJOUT DU CONTENU------------------------------
 		 //Ajouter les amas
-		  for(int i = 0; i<Principe.nb_amas;i++){
-			  if(Principe.amas[0][i].getMvir()>MASS_LIMIT){
+		  for(int i = 0; i<Main.Main.amas[0].length;i++){
+			  if(Main.Main.amas[0][i].getMvir()>MASS_LIMIT){
 				  objRoot.addChild(create_amas(i));
 			  		avecmasse++;
 			  }
@@ -150,17 +151,17 @@ public class Simulation extends Applet{
 			//------------------------PATH---------------------------
 			//Creer la fonction de rotation au cour du temps
 			//La duree de transition est faite sur la duree de la simulation (en millisecondes)
-			 Alpha transAlpha=new Alpha(-1,(int)Principe.duree_sim*1000);
+			 Alpha transAlpha=new Alpha(-1,(int)Main.Main.duree_simulation*1000);
 			
 			//Creation du chemin : un amas prendra autant de positions successives (keyframes, pas position reelle)
 			//qu'il y a de frame dans la simulation
-			Point3f[] chemin=new Point3f[Principe.amas.length];
+			Point3f[] chemin=new Point3f[Main.Main.amas.length];
 			float x, y,z;
-			for(int i = 0; i<Principe.amas.length;i++){
+			for(int i = 0; i<Main.Main.amas.length;i++){
 				
-				x = (float)(Principe.amas[i][amas_index].getPos().getX() / RESCALING);
-				y = (float)(Principe.amas[i][amas_index].getPos().getY() / RESCALING);
-				z = (float)(Principe.amas[i][amas_index].getPos().getZ() / RESCALING);
+				x = (float)(Main.Main.amas[i][amas_index].getPos().getX() / RESCALING);
+				y = (float)(Main.Main.amas[i][amas_index].getPos().getY() / RESCALING);
+				z = (float)(Main.Main.amas[i][amas_index].getPos().getZ() / RESCALING);
 				
 				//X REG
 				if( x > SIMULATION_SIZE){
@@ -192,9 +193,9 @@ public class Simulation extends Applet{
 			
 			//Creer un tableau de correspondance
 			//Divise la totalite des positions des frames sur une echelle de 0 a 1
-			float[] timePosition= new float[Principe.amas.length];
-			for(int i = 0; i<Principe.amas.length;i++){
-				timePosition[i] = ((float)i) *(1.0f/(float)(Principe.amas.length-1));
+			float[] timePosition= new float[Main.Main.amas.length];
+			for(int i = 0; i<Main.Main.amas.length;i++){
+				timePosition[i] = ((float)i) *(1.0f/(float)(Main.Main.amas.length-1));
 				//La position a t = i est donc ( i * echelle de temps separant deux frames)
 				
 			}
@@ -215,7 +216,7 @@ public class Simulation extends Applet{
 			
 			//--------------------------------RENDERING------------------------------------
 			
-			double masse = Principe.amas[0][amas_index].getMvir();
+			double masse = Main.Main.amas[0][amas_index].getMvir();
 			float mass_visual = (float)(Math.sqrt(Math.sqrt(masse/MASS_MAX)));
 			
 			Sphere sphere;
@@ -370,6 +371,12 @@ public class Simulation extends Applet{
 			  viewtrans.setTransform(t3d);
 		}
 		
-
-
+		
+		/**
+		 * Modifie la taille de la zone a simuler
+		 * @param MPCs taille totale en MegaParsec d'une arrete du cube contenant la simulation
+		 */
+		public static void setRescaling(int MPCs){
+			RESCALING = (((double)MPCs)/100.0)*3.086*Math.pow(10, 22);
+		}
 }

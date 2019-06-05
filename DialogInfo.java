@@ -1,3 +1,5 @@
+package Interface_Utilisateur;
+
 public class DialogInfo {
   private String annee, second;
 
