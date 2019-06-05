@@ -7,40 +7,8 @@ public class AnalyseDonnees {
 	final static int NB = 11508;
 	final static double MPC = 3.0856775814672 * Math.pow(10.0, 22.0);
 	static double avancement = 0;
-	
-	/**
-	 * Calcule le vecteur position d un amas à partir de sa latitude, sa longitude et de sa distance
-	 * @param amas
-	 * @return Vecteur position initial
-	 */
-	public static Vect3 calculCoordonnees(Amas amas) {
-		Vect3 vectPos = new Vect3(0, 0, 0);
-		
-		double glon = amas.getGlon();
-		double glat = amas.getGlat();
-		double distance = amas.getDist();
-
-		vectPos.setX(distance * (Math.cos(Math.toRadians(glat))) * (Math.sin(Math.toRadians(glon))));
-		vectPos.setY(distance * (Math.cos(Math.toRadians(glat))) * (Math.cos(Math.toRadians(glon))));
-		vectPos.setZ(distance * (Math.sin(Math.toRadians(glat))));
-		
-		return vectPos;
-	}
-	
-	/**
-	 * Calcule le vecteur vitesse propre d un amas pour initialiser sa vitesse a t = 0
-	 * @param amas
-	 * @return
-	 */
-	public static Vect3 vitesseInit(Amas amas) {
-		double vx, vy, vz;
-		
-		vx = (amas.getPos().getX()/amas.getDist())*(amas.getVgsr()-75*(amas.getDist()/MPC))*1000;
-		vy = (amas.getPos().getY()/amas.getDist())*(amas.getVgsr()-75*(amas.getDist()/MPC))*1000;
-		vz = (amas.getPos().getZ()/amas.getDist())*(amas.getVgsr()-75*(amas.getDist()/MPC))*1000;
-		
-		return new Vect3(vx,vy,vz);
-	}
+	static int H0 = 75;
+	static double VAR = H0 / MPC;
 	
 	/**
 	 * Calcule la distance entre 2 amas
@@ -97,7 +65,7 @@ public class AnalyseDonnees {
 				} else {// vecteur pas encore change (amas suivants > j)
 					distance = calculDist(x, y, z, t[i][k].getPos2().getX(), t[i][k].getPos2().getY(), t[i][k].getPos2().getZ());
 					distance2 = distance*distance;// d
-					force = masse / distance2;// mB/d²
+					force = masse / distance2;// mB/dÂ²
 					// norme du vecteur 
 					tmp.setX((t[i][k].getPos2().getX() - x)/distance);
 					tmp.setY((t[i][k].getPos2().getY() - y)/distance);
@@ -110,6 +78,30 @@ public class AnalyseDonnees {
 		res.mul(G);// facteur constante G
 
 		return res;
+	}
+	
+	/**
+	 * Calcule la vitesse de l amas avec l expansion
+	 * @param i
+	 * @param j
+	 * @param t
+	 * @return le vecteur vitesse Expansion
+	 */
+	public static Vect3 vitesseExp(int i, int j, Amas[][] t) {
+		double expX, expY, expZ, dist, x, y, z;
+
+		x = t[i][j].getPos().getX() * t[i][j].getPos().getX();
+		y = t[i][j].getPos().getY() * t[i][j].getPos().getY();
+		z = t[i][j].getPos().getZ() * t[i][j].getPos().getZ();
+
+		dist = Math.sqrt(x + y + z);
+
+		expX = (t[i][j].getPos().getX() / dist) * Math.abs((VAR * t[i][j].getPos().getX()));
+		expY = (t[i][j].getPos().getY() / dist) * Math.abs((VAR * t[i][j].getPos().getY()));
+		expZ = (t[i][j].getPos().getZ() / dist) * Math.abs((VAR * t[i][j].getPos().getZ()));
+
+		return new Vect3(expX, expY, expZ);
+
 	}
 	
 	/**
@@ -163,21 +155,45 @@ public class AnalyseDonnees {
 		Amas[][] res = new Amas[frames][NB];//initialisation du tableau
 		LectureDonnees.donnees(res,time);
 		
-		for (int f = 1; f < frames - 1; f++) {
+		if (opt == 0) {
+			for (int f = 1; f < frames - 1; f++) {
+				for (int j = 0; j < NB; j++) {
+					// pos2 est la position a t+1 qui est calcule l'instant t
+					res[f][j].setPos(Vect3.copie(res[f][j].getPos2()));// a chaque debut de boucle on remet la position2
+																		// a la position1
+					res[f][j].setVit(calculVit(f, j, res, time));// calcule de la vitesse
+					res[f][j].setPos2(calculPos(f, j, res, time));// calcule de la position pour la prochaine frame dans
+																	// pos2
+					res[f + 1][j] = Amas.copie(res[f][j]);// copie de l'amas a la frame+1
+				}
+				avancement = f * 100 / (frames - 1);
+				System.out.println(avancement + " %");
+			}
+
 			for (int j = 0; j < NB; j++) {
-				//pos2 est la position a t+1 qui est calcule l'instant t 
-				res[f][j].setPos(Vect3.copie(res[f][j].getPos2()));// a chaque debut de boucle on remet la position2 a la position1 
-				res[f][j].setVit(calculVit(f, j, res, time));//calcule de la vitesse 
-				res[f][j].setPos2(calculPos(f, j, res, time));//calcule de la position pour la prochaine frame dans pos2
-				res[f + 1][j] = Amas.copie(res[f][j]);//copie de l'amas a la frame+1
-			}			
-			avancement = f*100/(frames-1);
-			System.out.println(avancement+" %");
+				res[frames - 1][j].setPos(Vect3.copie(res[frames - 1][j].getPos2()));
+			}
+		} else {
+			for (int f = 1; f < frames - 1; f++) {
+				for (int j = 0; j < NB; j++) {
+					// pos2 est la position a t+1 qui est calcule l'instant t
+					res[f][j].setPos(Vect3.copie(res[f][j].getPos2()));// a chaque debut de boucle on remet la position2
+																		// a la position1
+					res[f][j].getVit().addV(vitesseExp(f,j,res));// ajout de la vitesse d expansion
+					res[f][j].setVit(calculVit(f, j, res, time));// calcule de la vitesse
+					res[f][j].setPos2(calculPos(f, j, res, time));// calcule de la position pour la prochaine frame dans
+																	// pos2
+					res[f + 1][j] = Amas.copie(res[f][j]);// copie de l'amas a la frame+1
+				}
+				avancement = f * 100 / (frames - 1);
+				System.out.println(avancement + " %");
+			}
+
+			for (int j = 0; j < NB; j++) {
+				res[frames - 1][j].setPos(Vect3.copie(res[frames - 1][j].getPos2()));
+			}
 		}
-		
-		for (int j = 0; j < NB; j++) {
-			res[frames - 1][j].setPos(Vect3.copie(res[frames - 1][j].getPos2()));
-		}
+
 		
 		return res;
 	}
