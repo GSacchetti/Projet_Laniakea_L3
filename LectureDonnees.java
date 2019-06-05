@@ -12,7 +12,8 @@ import java.io.InputStreamReader;
 public class LectureDonnees {
 	final static double TMsun = 1.9884 * Math.pow(10.0, 42.0);
 	final static double MPC = 3.0856775814672 * Math.pow(10.0, 22.0);
-	
+	final static int H0 = 75;
+	static double VAR = H0/MPC;
 	/**
 	 * Initialise le tableau principal[nbFrames][nbAmas] apres lecture du fichier table2.dat 
 	 * Distance en metre et poids en kilogramme
@@ -132,6 +133,7 @@ public class LectureDonnees {
 						}
 					}
 					galaxy.setPos(AnalyseDonnees.calculCoordonnees(galaxy));
+					galaxy.setVit(vitesseInit(galaxy));
 					tab[0][c] = galaxy;
 					c++;
 				}
@@ -158,7 +160,7 @@ public class LectureDonnees {
 
 	public static void main(String[] args) throws IOException {
 		int f = 15;
-		Amas[][] tab = AnalyseDonnees.produitFinal(40, f);// 1.26144*Math.pow(10, 15) == 40
+		Amas[][] tab = AnalyseDonnees.produitFinal(40, f, 0);// 1.26144*Math.pow(10, 15) == 40
 																					// millions d annees
 		for (int i = 0; i < f; i++) {
 			for (int j = 0; j < 1; j++) {
