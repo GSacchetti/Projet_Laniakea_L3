@@ -80,8 +80,8 @@ public class LectureDonnees {
 							}
 							galaxy.setgName(mot);
 							break;
-						case 56:
-							for (int j = compteur; j < 62; j++) {
+						case 70:
+							for (int j = compteur; j < 78; j++) {
 								if (!Character.isWhitespace(charArray[j])) {
 									mot += charArray[j];
 								}
@@ -89,8 +89,8 @@ public class LectureDonnees {
 							}
 							galaxy.setGlon(Double.parseDouble(mot));
 							break;
-						case 63:
-							for (int j = compteur; j < 69; j++) {
+						case 79:
+							for (int j = compteur; j < 87; j++) {
 								if (!Character.isWhitespace(charArray[j])) {
 									mot += charArray[j];
 								}
@@ -133,7 +133,7 @@ public class LectureDonnees {
 						}
 					}
 					galaxy.setPos(AnalyseDonnees.calculCoordonnees(galaxy));
-					galaxy.setVit(vitesseInit(galaxy));
+					galaxy.setVit(vitesseInit(galaxy)); // vitesse initale ajout
 					tab[0][c] = galaxy;
 					c++;
 				}
