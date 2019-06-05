@@ -1,14 +1,14 @@
 package Donnees;
 
 public class Amas {
-	private int nest, vgsr;
+	private int nest, vls;
 	private String abell, gName;
 	private double glon, glat, dist, mvir;
 	private Vect3 vit, pos, pos2;
 
 	public Amas() {
 		this.nest = 0;
-		this.vgsr = 0;
+		this.vls = 0;
 		this.mvir = 0;
 		this.abell = "";
 		this.gName = "";
@@ -27,7 +27,7 @@ public class Amas {
 	public static Amas copie(Amas a) {
 		Amas res = new Amas();
 		res.nest = a.nest;
-		res.vgsr = a.vgsr;
+		res.vls = a.vls;
 		res.mvir = a.mvir;
 		res.abell = a.abell;
 		res.gName = a.gName;
@@ -72,12 +72,12 @@ public class Amas {
 		this.nest = nest;
 	}
 
-	public int getVgsr() {
-		return vgsr;
+	public int getVls() {
+		return vls;
 	}
 
-	public void setVgsr(int vgsr) {
-		this.vgsr = vgsr;
+	public void setVls(int vls) {
+		this.vls = vls;
 	}
 
 	public double getMvir() {
