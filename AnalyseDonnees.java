@@ -149,7 +149,7 @@ public class AnalyseDonnees {
 	 * @return Tableau avec toutes les positions de chaque amas
 	 * @throws IOException
 	 */
-	public static Amas[][] produitFinal(double dt, int frames) throws IOException {
+	public static Amas[][] produitFinal(double dt, int frames, int opt) throws IOException {
 		double time = dt * 3.1536*Math.pow(10, 13);// transformation du temps en seconde
 		
 		Amas[][] res = new Amas[frames][NB];//initialisation du tableau
