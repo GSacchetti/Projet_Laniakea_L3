@@ -146,6 +146,7 @@ public class AnalyseDonnees {
 	 * Produit un tableau avec les positions des amas a chaque frame tableau[nbFrames][nbAmas]
 	 * @param dt deltaT temps en million d'annees
 	 * @param frames nombre de frame de la simulation
+	 * @param opt 0 = sans vitesse d expansion, autre avec vitesse d expansion 
 	 * @return Tableau avec toutes les positions de chaque amas
 	 * @throws IOException
 	 */
