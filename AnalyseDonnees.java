@@ -77,7 +77,7 @@ public class AnalyseDonnees {
 					distance = calculDist(x, y, z, t[i][k].getPos2().getX(), t[i][k].getPos2().getY(),
 							t[i][k].getPos2().getZ());
 					distance2 = distance * distance;// d
-					force = masse / distance2;// mB/d²
+					force = masse / distance2;// mB/dÂ²
 					a = 1/ distance;
 					// norme du vecteur
 					tmp.setX((t[i][k].getPos2().getX() - x) * a);
@@ -171,7 +171,7 @@ public class AnalyseDonnees {
 		final double time = dt * 3.1536 * Math.pow(10, 13);// transformation du temps en seconde
 
 		res = new Amas[frames][NB];// initialisation du tableau
-		LectureDonnees.donnees(res, time);
+		LectureDonnees.donnees(res, time, opt);
 
 
 
