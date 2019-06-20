@@ -131,7 +131,7 @@ public class LectureDonnees {
 						}
 					}
 					galaxy.setPos(calculCoordonnees(galaxy));
-					galaxy.setVit(vitesseInit(galaxy));
+					//galaxy.setVit(vitesseInit(galaxy));
 					tab[0][c] = galaxy;
 					c++;
 				}
@@ -151,7 +151,7 @@ public class LectureDonnees {
 	}
 	
 	/**
-	 * Calcule le vecteur position d un amas à partir de sa latitude, sa longitude et de sa distance
+	 * Calcule le vecteur position d un amas Ã  partir de sa latitude, sa longitude et de sa distance
 	 * @param amas
 	 * @return Vecteur position initial
 	 */
