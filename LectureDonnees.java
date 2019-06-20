@@ -17,9 +17,10 @@ public class LectureDonnees {
 	 * Distance en metre et poids en kilogramme
 	 * @param tab Tableau avec toutes les positions
 	 * @param dt Temps en seconde
+	 * @param opt option
 	 * @throws IOException
 	 */
-	public static void donnees(Amas[][] tab, double dt) throws IOException {
+	public static void donnees(Amas[][] tab, double dt, int opt) throws IOException {
 		String ligne = "";
 
 		int c = 0;
@@ -131,7 +132,9 @@ public class LectureDonnees {
 						}
 					}
 					galaxy.setPos(calculCoordonnees(galaxy));
-					//galaxy.setVit(vitesseInit(galaxy));
+					if (opt != 0) {
+						galaxy.setVit(vitesseInit(galaxy));
+					}
 					tab[0][c] = galaxy;
 					c++;
 				}
@@ -177,9 +180,10 @@ public class LectureDonnees {
 	public static Vect3 vitesseInit(Amas amas) {
 		double vx, vy, vz;
 		
-		vx = (amas.getPos().getX()/amas.getDist())*(amas.getVls()-Math.abs((VAR * amas.getPos().getX())))*1000;
-		vy = (amas.getPos().getY()/amas.getDist())*(amas.getVls()-Math.abs((VAR * amas.getPos().getY())))*1000;
-		vz = (amas.getPos().getZ()/amas.getDist())*(amas.getVls()-Math.abs((VAR * amas.getPos().getZ())))*1000;
+		a = 1 / amas.getDist();
+		vx = (amas.getPos().getX() * a) * (amas.getVls() - Math.abs((VAR * amas.getPos().getX()))) * 1000;
+		vy = (amas.getPos().getY() * a) * (amas.getVls() - Math.abs((VAR * amas.getPos().getY()))) * 1000;
+		vz = (amas.getPos().getZ() * a) * (amas.getVls() - Math.abs((VAR * amas.getPos().getZ()))) * 1000;
 		
 		return new Vect3(vx,vy,vz);
 	}
