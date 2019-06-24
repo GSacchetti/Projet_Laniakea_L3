@@ -14,4 +14,4 @@ III- Visualisation :
 
 -Utilise le rendu contenu dans le tableau d'Amas[][] pour representer les objets ainsi que leur chemin au cours du temps.
 
-Pour lancer la simulation : Utiliser Galaxie.jar
+Pour lancer la simulation, utiliser Galaxie.jar.
