@@ -25,7 +25,11 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-
+/**
+ * 
+ * Redifinition de la classe MainFrame de Java3D pour des modifications imperatives
+ *
+ */
 public class Simulation_Frame extends Frame implements
                    Runnable, AppletStub, AppletContext
 {

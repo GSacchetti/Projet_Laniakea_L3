@@ -3,6 +3,11 @@ package Visualisation;
 import javax.media.j3d.QuadArray;
 import javax.media.j3d.Shape3D;
 
+/**
+ * Une version legerement modifiee de Cube, ajoute une regle d'echelle
+ * @author Guillaume Fourniols
+ *
+ */
 public class Simulation_Cube extends Shape3D{
 
 	   private static final float[] verts = {

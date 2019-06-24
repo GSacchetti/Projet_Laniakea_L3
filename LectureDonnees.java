@@ -17,10 +17,9 @@ public class LectureDonnees {
 	 * Distance en metre et poids en kilogramme
 	 * @param tab Tableau avec toutes les positions
 	 * @param dt Temps en seconde
-	 * @param opt option
 	 * @throws IOException
 	 */
-	public static void donnees(Amas[][] tab, double dt, int opt) throws IOException {
+	public static void donnees(Amas[][] tab, double dt) throws IOException {
 		String ligne = "";
 
 		int c = 0;
@@ -28,7 +27,7 @@ public class LectureDonnees {
 
 		BufferedReader ficTexte;
 		try {
-			ficTexte = new BufferedReader(new FileReader(new File("table3.dat")));
+			ficTexte = new BufferedReader(new FileReader(new File("table2.dat")));
 
 			do {
 				ligne = ficTexte.readLine();
@@ -132,15 +131,13 @@ public class LectureDonnees {
 						}
 					}
 					galaxy.setPos(calculCoordonnees(galaxy));
-					if (opt != 0) {
-						galaxy.setVit(vitesseInit(galaxy));
-					}
+					//galaxy.setVit(vitesseInit(galaxy));
 					tab[0][c] = galaxy;
 					c++;
 				}
 			} while (ligne != null);
 			for(int i = 0; i < tab[0].length; i++) { // boucle qui initialise la position a t+1 dechaque amas
-				tab[0][i].setPos2(AnalyseDonnees.calculPos(0, i, tab, dt));
+				tab[0][i].setPos2(AnalyseDonnees.calculPos(0, i, tab, dt, 1));
 				tab[1][i] = Amas.copie(tab[0][i]);
 			}
 			System.out.println("Lecture finie.");
@@ -154,7 +151,7 @@ public class LectureDonnees {
 	}
 	
 	/**
-	 * Calcule le vecteur position d un amas Ã  partir de sa latitude, sa longitude et de sa distance
+	 * Calcule le vecteur position d un amas à partir de sa latitude, sa longitude et de sa distance
 	 * @param amas
 	 * @return Vecteur position initial
 	 */
@@ -180,10 +177,9 @@ public class LectureDonnees {
 	public static Vect3 vitesseInit(Amas amas) {
 		double vx, vy, vz;
 		
-		a = 1 / amas.getDist();
-		vx = (amas.getPos().getX() * a) * (amas.getVls() - Math.abs((VAR * amas.getPos().getX()))) * 1000;
-		vy = (amas.getPos().getY() * a) * (amas.getVls() - Math.abs((VAR * amas.getPos().getY()))) * 1000;
-		vz = (amas.getPos().getZ() * a) * (amas.getVls() - Math.abs((VAR * amas.getPos().getZ()))) * 1000;
+		vx = (amas.getPos().getX()/amas.getDist())*(amas.getVls()-Math.abs((VAR * amas.getPos().getX())))*1000;
+		vy = (amas.getPos().getY()/amas.getDist())*(amas.getVls()-Math.abs((VAR * amas.getPos().getY())))*1000;
+		vz = (amas.getPos().getZ()/amas.getDist())*(amas.getVls()-Math.abs((VAR * amas.getPos().getZ())))*1000;
 		
 		return new Vect3(vx,vy,vz);
 	}

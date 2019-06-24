@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import Interface_Utilisateur.Fenetre;
 import Visualisation.Simulation_Frame;
+import Visualisation.Simulation_Update_Thread;
 
 
 //Centralise toutes les donnees interagissant dans la simulation
@@ -17,16 +18,22 @@ public class Main {
 	public static int duree_simulation = 1;
 	public static double annee_fin;
 	public static double delta_t;
+	public static int nombre_frame;
+	public static int expansion;
+	
 	//Remettre calcul_termine a "false" en cas de reinitialisation de la simulation
 	public static boolean calcul_termine = false;
 	
 	//AWT
-	public static Fenetre request_frame;
+	public static Interface_Utilisateur.Fenetre request_frame;
 	public static Visualisation.Simulation simulation;
 	public static Visualisation.Simulation_Frame simulation_frame;
+	private static Simulation_Update_Thread updater;
 	
-	
-	
+	/**
+	 * main principal
+	 * @param args
+	 */
 	public static void main(String args[]){
 		System.out.println("Lancement du programme :");
 		//Premiere fenetre permettant de rentrer les donnees necessaires au calcul
@@ -47,13 +54,14 @@ public class Main {
 			System.out.println("Voir request_frame");
 			System.exit(0);
 		}
-		amas = Donnees.AnalyseDonnees.produitFinal(delta_t,duree_simulation);
+		amas = Donnees.AnalyseDonnees.produitFinal(delta_t,nombre_frame,expansion);
 	}
 	
 	/**
 	 * Instancie la fenetre de rendu de la simulation
 	 * Cette fonction ne doit pas etre appelee avant la fin du calcul de donnees par Donnees.AnalyseDonnees
 	 * Cette fonction doit etre appelee par un event de "request_frame"
+	 * @throws InterruptedException 
 	 */
 	public static void lancer_simulation(){
 		if(!calcul_termine){
@@ -67,6 +75,10 @@ public class Main {
 		int width = (int)screenSize.getWidth();
 		int height = (int)screenSize.getHeight();
 		Frame f = new Simulation_Frame(simulation, width, height, false);
+
+		 updater = new Simulation_Update_Thread();
+		 Thread thread = new Thread(updater);
+		 thread.start();
 	}
 	
 }

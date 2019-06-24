@@ -81,9 +81,14 @@ public class Simulation_Navigator {
 
 	private static final int KEY_UP = (1 << 13);
 	private static final int KEY_DOWN = (1 << 14);
+	
+	private static final int ESCAPE = (1 << 15);
 
 	private int key_state = 0;
 	private int modifier_key_state = 0;
+	private boolean switcher = false;
+	private boolean signal = false;
+	private boolean quit = false;
 
 	/**
 	 * Constructs a new key navigator object that operates on the specified
@@ -225,7 +230,18 @@ public class Simulation_Navigator {
 	public void integrateTransformChanges() {
 		double scaleVel, scaleRot, scaleScale, pre;
 		double udAng, lrAng, r;
-
+		if (signal){
+			switcher = !switcher;
+			signal = !signal;
+			Main.Main.simulation.setPause(switcher);
+			
+		}
+		
+		if (quit){
+			System.exit(2);
+			
+		}
+		
 		// Get the current View Platform transform into a transform3D object.
 		targetTG.getTransform(vpTrans);
 		// Extract the position, quaterion, and scale from the transform3D.
@@ -420,8 +436,11 @@ public class Simulation_Navigator {
 			// Extract the position, quaterion, and scale from the nominal
 			// transform
 			vpScale = nominal.get(vpQuat, vpPos);
-			vpPos.z = 250.0f;
+				vpPos.z = 300;
+				vpPos.x = 0;
+
 		}
+
 
 		/* Final update of view platform */
 		// Put the transform back into the transform group.
@@ -448,7 +467,6 @@ public class Simulation_Navigator {
 	public void processKeyEvent(KeyEvent keyEvent) {
 		int keyCode = keyEvent.getKeyCode();
 		int keyChar = keyEvent.getKeyChar();
-
 		// System.err.println("keyCode " + keyCode + "  keyChar " + keyChar);
 
 		if (keyEvent.getID() == KeyEvent.KEY_RELEASED) {
@@ -476,6 +494,13 @@ public class Simulation_Navigator {
 					break;
 				case KeyEvent.VK_EQUALS:
 					key_state &= ~HOME_NOMINAL;
+					break;
+				case 32:
+					signal = true;
+					key_state |= HOME_DIR;
+					break;
+				case 27:
+					quit = true;
 					break;
 				default:
 					switch (keyChar) {
@@ -508,6 +533,9 @@ public class Simulation_Navigator {
 				break;
 			case KeyEvent.VK_EQUALS:
 				key_state |= HOME_NOMINAL;
+				break;
+			case 32:
+				key_state |= HOME_DIR;
 				break;
 			default:
 				switch (keyChar) {

@@ -17,11 +17,6 @@ public class Vect3 {
 		this.y *= d;
 		this.z *= d;
 	}
-	/**
-	 * Renvoie une copie de du vecteur qui est passe en parametre
-	 * @param d vecteur a copie
-	 * @return vecteur copie
-	 */
 	public static Vect3 copie(Vect3 d) {
 		return new Vect3(d.x,d.y,d.z);
 	}

@@ -40,24 +40,33 @@ import com.sun.j3d.utils.universe.ViewingPlatform;
 //Classe dediee a la visualisation du calcul realisee par Donnes.AnalyseDonnees
 public class Simulation extends Applet{
 	
-	
+
 	private static final long serialVersionUID = 1L;
 	private SimpleUniverse universe = null;
 	private Canvas3D canvas = null;
-	private TransformGroup viewtrans = null;
+	private TransformGroup view_trans = null;
+	private BranchGroup view_trans_branch = null;
 	private BranchGroup root;
+	
+	private BranchGroup year;
 	
 	//Remise a echelle de la simulation
 	private static double RESCALING = 1.0*Math.pow(10, 23);
-	private static double PARSEC = 3.086*Math.pow(10, 22);
+	private static double MEGAPARSEC = 3.086*Math.pow(10, 22);
 	//Taille du cube contenant la simulation
 	private final static float SIMULATION_SIZE = 50.0f;
 	//Coordonnees d'explusion d'un objet sortant du cube
-	private final static float EXPULSION_RANGE = Float.MAX_VALUE;
+	private final static float EXPULSION_RANGE = (float) Math.pow(10, 5);
 	//Masse limite d'affichage des amas
 	private static double MASS_LIMIT = 1.0;
 	//Masse maximale existante dans les donnees
 	private static double MASS_MAX = 5.859151867440001*Math.pow(10, 46);
+	//Nombre maximum d'objet rendu
+	private static int MAX_RENDU = Integer.MAX_VALUE;
+	
+	//Keyframe rate de la simulation (temps pour passer d'une keyframe a une autre
+	private static int KEYFRAME_RATE = 4;
+	
 	
 	//Amas selectionne pour etre mis en evidence lors de la simulation
 	private static int viewable_cluster = 1;
@@ -83,23 +92,25 @@ public class Simulation extends Applet{
 		 //end of 3D setup	  
 
 		 
-		  add(canvas);	
-		 setViewerPosition(new Vector3f(0.0f,0.0f,250.0f));
+		 add(canvas);	
+		 setViewerPosition(new Vector3f(0.0f,0.0f,300.0f));
 		 
 		 }
 	 
 	
-	//Initialisation de la scene 3D
-	//Retourne une branch contenant l'integralite des objets contenus dans la scene
+	/**Initialisation de la scene 3D
+	*Retourne une branch contenant l'integralite des objets contenus dans la scene
+	*/
 	 private BranchGroup createSceneGraph() {
 		  BranchGroup objRoot = new BranchGroup();
 		  BoundingSphere bounds = new BoundingSphere(new Point3d(), 100.0);
 
-		  viewtrans = universe.getViewingPlatform().getViewPlatformTransform();
+		  view_trans_branch = universe.getViewingPlatform();
+		  view_trans = universe.getViewingPlatform().getViewPlatformTransform();
 		  
-		  
+			
 		  //---------------------------DEPLACEMENT DANS LA SCENE--------------------
-		  Simulation_Navigator_Behaviour sim_nav = new Simulation_Navigator_Behaviour(viewtrans, new Vector3d(50.0f,50000.0f,50.0f));
+		  Simulation_Navigator_Behaviour sim_nav = new Simulation_Navigator_Behaviour(view_trans, new Vector3d(50.0f,50000.0f,50.0f));
 		  sim_nav.setSchedulingBounds(bounds);
 		  PlatformGeometry pg = new PlatformGeometry();
 		  pg.addChild(sim_nav);
@@ -108,7 +119,9 @@ public class Simulation extends Applet{
 
 		 //---------------------------AJOUT DU CONTENU------------------------------
 		 //Ajouter les amas
-		  for(int i = 0; i<Main.Main.amas[0].length;i++){
+		  int nombre_rendu = Math.min(Main.Main.amas[0].length, MAX_RENDU);
+		  
+		  for(int i = 0; i<nombre_rendu;i++){
 			  if(Main.Main.amas[0][i].getMvir()>MASS_LIMIT){
 				  objRoot.addChild(create_amas(i));
 			  		avecmasse++;
@@ -118,16 +131,24 @@ public class Simulation extends Applet{
 			  }
 		  }
 		  
+		  //Ajouter les vecteurs vitesses
+//		  for(int i = 0; i<nombre_rendu;i++){
+//			  if(Main.Main.amas[0][i].getMvir()>MASS_LIMIT){
+//				  objRoot.addChild(create_vector(i));
+//			  }
+//		  }
 		  System.out.println("Total des objets representes :" + (avecmasse));
 		  System.out.println("	- Superieur a la masse limite : " + avecmasse);
 		  System.out.println("	- Inferieur a la masse limite : " + sansmasse);
 		  
 		  objRoot.addChild(createLight());
 		  objRoot.addChild(createWireCube());
-		  
 		  //Texte a afficher pour echelle de la simulation
 		  objRoot.addChild(createText2D(("Unit : \n" + (RESCALING*10.0)) + " m",new Vector3d(-50.0f,-56.0f,50.0f)));
 		  objRoot.addChild(createText2D(("Total : \n" + (RESCALING*100.0)) + " m³",new Vector3d(52.0f,0.0f,50.0f)));
+		  
+		  year = createText2D(("Annee : \n" + (0)) + " Ma",new Vector3d(30.0f,-56.0f,50.0f));
+		  objRoot.addChild(year);
 		 
 		  return objRoot;
 		 }
@@ -137,6 +158,7 @@ public class Simulation extends Applet{
 	 	* Cree une branche contenant la representation d'un amas
 	 	* Prend en parametre l'indice de ce dernier dans le tableau rendu par l'exploitation des donnees
 	 	* A l'objet rendu est integre le chemin qu'il suivra au cours de la simulation
+	 	* @param amas_index l'index dans le tableau d'Amas de Main.Main a instancier
 	 	*/
 	 	private BranchGroup create_amas(int amas_index){
 	 		BranchGroup objRoot = new BranchGroup();
@@ -151,7 +173,7 @@ public class Simulation extends Applet{
 			//------------------------PATH---------------------------
 			//Creer la fonction de rotation au cour du temps
 			//La duree de transition est faite sur la duree de la simulation (en millisecondes)
-			 Alpha transAlpha=new Alpha(-1,(int)Main.Main.duree_simulation*1000);
+			 Alpha transAlpha=new Alpha(-1,(int)(Main.Main.nombre_frame*(1000.0/(double)KEYFRAME_RATE)));
 			
 			//Creation du chemin : un amas prendra autant de positions successives (keyframes, pas position reelle)
 			//qu'il y a de frame dans la simulation
@@ -207,7 +229,7 @@ public class Simulation extends Applet{
 			//Peut avoir des utilites en terme de performance.
 			//Dans la logique d'une simulation, on preferera permettre la mouvement quel que soit la distance a l'objet.
 			BoundingSphere bounds=new BoundingSphere();
-			bounds.setRadius(500.0);
+			bounds.setRadius(1000000.0);
 			interpol.setSchedulingBounds(bounds);
 			interpol.setName("interpolateur");
 			
@@ -267,6 +289,49 @@ public class Simulation extends Applet{
 			return objRoot;
 	 	}
 	 	
+	 	/**
+	 	 * Cree une branche contenant les vecteurs vitesse (modeles 3d) representant les deplacement de l'amas
+	 	 * @param amas_index 
+	 	 * @return branche contenant l'ensemble des vecteurs
+	 	 */
+	 	public BranchGroup create_vector(int amas_index){
+	 		BranchGroup objRoot = new BranchGroup();
+			TransformGroup tg;
+			Transform3D t3d;
+	 		float x, y, z;
+	 		float x2,y2,z2;
+	 		Simulation_Vector vector;
+	 		
+	 		Appearance app = new Appearance();
+			PolygonAttributes polyAttrbutes = new PolygonAttributes();
+			polyAttrbutes.setPolygonMode( PolygonAttributes.POLYGON_LINE );
+			polyAttrbutes.setCullFace(PolygonAttributes.CULL_NONE);
+			app.setPolygonAttributes(polyAttrbutes);
+
+	 		for(int i = 1; i<Main.Main.amas.length;i++){
+	 			tg = new TransformGroup();
+	 			t3d = new Transform3D();
+	 			x = (float)(Main.Main.amas[i-1][amas_index].getPos().getX() / RESCALING);
+				y = (float)(Main.Main.amas[i-1][amas_index].getPos().getY() / RESCALING);
+				z = (float)(Main.Main.amas[i-1][amas_index].getPos().getZ() / RESCALING);
+				
+				x2 = (float)(Main.Main.amas[i-1][amas_index].getPos().getX() / RESCALING);
+				y2 = (float)(Main.Main.amas[i-1][amas_index].getPos().getY() / RESCALING);
+				z2 = (float)(Main.Main.amas[i-1][amas_index].getPos().getZ() / RESCALING);
+				
+				double d = Math.sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2)+(z-z2)*(z-z2));
+				System.out.println(d);
+				t3d.set(new Vector3f(x,y,z));
+				vector = new Simulation_Vector(d);
+				vector.setAppearance(app);
+				tg.setTransform(t3d);
+				tg.addChild(vector);
+				objRoot.addChild(tg);
+	 		}
+	 		
+			objRoot.setName("vectors");
+	 		return objRoot;
+	 	}
 	 	
 
 		/**Ajouter de la lumiere
@@ -277,7 +342,7 @@ public class Simulation extends Applet{
 			 PointLight light = new PointLight(new Color3f(1.0f,
 					    1.0f, 1.0f), new Point3f(0.0f,0.0f,0.0f),new Point3f(0.0f,0.0f,0.0f));
 
-					  light.setInfluencingBounds(new BoundingSphere(new Point3d(), 100000.0));
+					  light.setInfluencingBounds(new BoundingSphere(new Point3d(), 500.0));
 					  light.setName("Lumiere");
 					  return light;
 		 }
@@ -302,11 +367,17 @@ public class Simulation extends Applet{
 			  return cc;
 		}
 		
-		/**Un simple cube pour contenir les objets de la simulation.
-		*Cree un cube de cote SIMULATION_SIZE*2
+		/**
+		*Cree un vecteur de taille scale oriente sur l'axe X
 		*/
 		private Simulation_Vector createVector(double scale){
 			 Appearance app = new Appearance();
+			 Material mat = new Material();
+			 mat.setAmbientColor(new Color3f(0.9f,0.9f,0.9f));
+			 mat.setDiffuseColor(new Color3f(0.3f,0.3f,0.3f));
+			 mat.setSpecularColor(new Color3f(0.8f,0.8f,0.8f));
+			 app.setMaterial(mat);	
+			  
 			 PolygonAttributes polyAttrbutes = new PolygonAttributes();
 			 polyAttrbutes.setPolygonMode( PolygonAttributes.POLYGON_LINE );
 			 polyAttrbutes.setCullFace(PolygonAttributes.CULL_NONE);
@@ -337,6 +408,17 @@ public class Simulation extends Applet{
 		}
 		
 		/**
+		 * Met a jour le texte contenant la date via l'alpha value des interpolateurs
+		 */
+		public void update_text(){
+			int year = (int)(this.getAlpha()*Main.Main.annee_fin);
+			String year_str;
+			year_str = ("Annee : \n" + (year) + " Ma");
+			((Text2D)((TransformGroup)this.year.getChild(0)).getChild(0)).setString(year_str);;
+		}
+		
+		
+		/**
 		 * Met en arret tout les interpolateurs de position de la simulation
 		 * (ou les remet en marche de la meme maniere.)
 		 * Pour des raisons inconnues, la remise en marche est dramatiquement plus lente
@@ -345,13 +427,26 @@ public class Simulation extends Applet{
 		 */
 		public void setPause(boolean pause_state){
 			for(int i = 0;i<this.root.numChildren();i++){
-				if(root.getChild(i).getName()!=null)
-				if(root.getChild(i).getName().equals("amas")){
-					((PositionPathInterpolator)(((TransformGroup)  ((BranchGroup)root.getChild(i)).getChild(0))  .getChild(0))).setEnable(!pause_state);
+				if(root.getChild(i).getName()!=null){
+					if(root.getChild(i).getName().equals("amas")){
+						if(pause_state){
+							((PositionPathInterpolator)(((TransformGroup)  ((BranchGroup)root.getChild(i)).getChild(0))  .getChild(0))).setEnable(false);
+							((PositionPathInterpolator)(((TransformGroup)  ((BranchGroup)root.getChild(i)).getChild(0))  .getChild(0))).getAlpha().pause();
+						}
+						else{
+							((PositionPathInterpolator)(((TransformGroup)  ((BranchGroup)root.getChild(i)).getChild(0))  .getChild(0))).setEnable(true);
+							((PositionPathInterpolator)(((TransformGroup)  ((BranchGroup)root.getChild(i)).getChild(0))  .getChild(0))).getAlpha().resume();
+						}
+					}
 				}
 			}
 		}
 		
+		/**
+		 * Actuellement non-fonctionnel
+		 * devrait permettre le reglage direct de l'alpha value des interpolateurs de position d'Amas
+		 * @param alpha
+		 */
 		public void setAlpha(float alpha){
 			for(int i = 0;i<this.root.numChildren();i++){
 				if(root.getChild(i).getName()!=null)
@@ -362,13 +457,30 @@ public class Simulation extends Applet{
 		}
 		
 		/**
+		 * Recupere la valeur alpha des interpolateurs de position.
+		 * Permet de connaitre l'avancee de la simulation dans la range 0-Main.Main.anneefin
+		 * @return Valeur alpha des interpolateurs (estimee egale pour tout les interpolateurs d'amas)
+		 */
+		public float getAlpha(){
+			Alpha alpha = new Alpha();
+			for(int i = 0;i<this.root.numChildren();i++){
+				if(root.getChild(i).getName()!=null)
+				if(root.getChild(i).getName().equals("amas")){
+					alpha = ((PositionPathInterpolator)(((TransformGroup)  ((BranchGroup)root.getChild(i)).getChild(0))  .getChild(0))).getAlpha();
+					break;
+				}
+			}
+			return alpha.value();
+		}
+		
+		/**
 		 * Permet de mettre le ViewerPlatform a l'endroit desire
 		 * @param v3
 		 */
 		public void setViewerPosition(Vector3f v3){
 			  Transform3D t3d = new Transform3D();
 			  t3d.setTranslation(v3);
-			  viewtrans.setTransform(t3d);
+			  view_trans.setTransform(t3d);
 		}
 		
 		
@@ -377,6 +489,37 @@ public class Simulation extends Applet{
 		 * @param MPCs taille totale en MegaParsec d'une arrete du cube contenant la simulation
 		 */
 		public static void setRescaling(int MPCs){
-			RESCALING = (((double)MPCs)/100.0)*3.086*Math.pow(10, 22);
+			RESCALING = (((double)MPCs)/100.0)*MEGAPARSEC;
+		}
+		
+		/**
+		 * Modifie le nombre de key frame a utiliser par seconde
+		 * affecte uniquement les interpolateurs de position des amas
+		 * @param kfr
+		 */
+		public static void setKeyFramerate(int kfr){
+			KEYFRAME_RATE = kfr;
+		}
+		
+		/**
+		 * Redefini le nombre maximum d'objets represente dans la simulation
+		 * @param max
+		 */
+		public static void setMaxRendu(int max){
+			MAX_RENDU = max;
+		}
+
+		/**
+		 * Permet de choisir la representation des objets sans masse connue
+		 * @param state
+		 */
+		public static void setLimitMass(boolean state) {
+			if(state){
+				MASS_LIMIT = -1.0;
+			}
+			else{
+				MASS_LIMIT = 1.0;
+			}
+			
 		}
 }
