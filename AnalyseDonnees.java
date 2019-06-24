@@ -201,10 +201,11 @@ public class AnalyseDonnees {
 				} else {
 					for (int f = 1; f < frames - 1; f++) {
 						for (int j = 0; j < NB; j++) {
+							Vect3 vitExp = vitesseExp(f,j,res);
+							vitExp.mul(dt);
 							// pos2 est la position a t+1 qui est calcule l'instant t
-							res[f][j].setPos(Vect3.copie(res[f][j].getPos2()));// a chaque debut de boucle on remet la position2
-							// a la position1
-							res[f][j].getVit().addV(vitesseExp(f,j,res));// ajout de la vitesse d expansion
+							res[f][j].setPos(Vect3.copie(res[f][j].getPos2()));// a chaque debut de boucle on remet la position2 a la position1			
+							res[f][j].getPos().addV(vitExp); // expansion			
 							res[f][j].setVit(calculVit(f, j, res, time));// calcule de la vitesse
 							res[f][j].setPos2(calculPos(f, j, res, time));// calcule de la position pour la prochaine frame dans
 							// pos2
