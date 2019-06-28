@@ -18,6 +18,8 @@ Pour avoir accès à la gestion du projet, le fichier est Planning.ods.
 
 La javadoc est disponible avec le fichier doc.rar.
 
+L'UML : UML.jpg et UML2.png
+
 Pour voir notre vidéo de présentation il faut télécharger la vidéo à ce lien : https://mega.nz/#!PL5hhaRJ!PgFN88RUQCjs08Oo0uLEYYveR2qIEiUiVUG1WD4YLAM
 
 Pour lancer la simulation, utiliser Projet_Galaxies.jar.
