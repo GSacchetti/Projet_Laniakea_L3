@@ -14,6 +14,8 @@ III- Visualisation :
 
 -Utilise le rendu contenu dans le tableau d'Amas[][] pour representer les objets ainsi que leur chemin au cours du temps.
 
+Le compte rendu : Rapport post-mortem _ Galaxies.pdf
+
 Pour avoir accès à la gestion du projet, le fichier est Planning.ods.
 
 La javadoc est disponible avec le fichier doc.rar.
