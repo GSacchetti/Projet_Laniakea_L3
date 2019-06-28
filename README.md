@@ -1,4 +1,6 @@
 # Projet_Laniakea_L3
+Participants : Amaury Bodart, Guillaume Sacchetti, Guillaume Fourniols, Tahiriniaina Andrian Rakotoarisoa, Thomas Tsangshumyuen, Kevin Siharath
+
 Viusalisation 3D, des trajectoires d'amas de Galaxie au sein de l'univers :
 
 I- Récupération des données :
