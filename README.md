@@ -15,7 +15,7 @@ III- Visualisation :
 -Utilise le rendu contenu dans le tableau d'Amas[][] pour representer les objets ainsi que leur chemin au cours du temps.
 
 Pour avoir accès à la gestion du projet, le fichier est Planning.ods
-
+La javadoc est disponible avec le fichier doc.rar.
 Pour voir notre vidéo de présentation il faut télécharger la vidéo à ce lien : https://mega.nz/#!PL5hhaRJ!PgFN88RUQCjs08Oo0uLEYYveR2qIEiUiVUG1WD4YLAM
 
 Pour lancer la simulation, utiliser Projet_Galaxies.jar.
